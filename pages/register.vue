@@ -10,41 +10,114 @@
         <span class="text-h4 d-block">Register</span>
       </v-card-title>
       <v-card-text class="px-5 px-md-16">
-        <!-- Email -->
-        <v-text-field label="Email"
-                      prepend-inner-icon="mdi-email">
-        </v-text-field>
+        <validation-observer ref="observer" v-slot="{ invalid }">
+          <form @submit.prevent="submit">
 
-        <!-- Password -->
-        <v-text-field label="Password"
-                      prepend-inner-icon="mdi-lock"
-                      type="password">
-        </v-text-field>
+            <!--      First Name      -->
+            <validation-provider v-slot="{ errors , valid }" name="first name" rules="required|max:20|alpha_spaces">
+              <v-text-field
+                v-model="firstName"
+                :counter="20"
+                :error-messages="errors"
+                :color="valid ? 'green' : ''"
+                :append-icon="valid ? 'mdi-check' : ''"
+                label="first name">
+              </v-text-field>
+            </validation-provider>
 
-        <!-- Password -->
-        <v-text-field label="Confirm Password"
-                      prepend-inner-icon="mdi-lock"
-                      type="password">
-        </v-text-field>
+            <!--      Last Name      -->
+            <validation-provider v-slot="{ errors , valid }" name="last name" rules="required|max:20|alpha_spaces">
+              <v-text-field
+                v-model="lastName"
+                :counter="20"
+                :error-messages="errors"
+                :color="valid ? 'green' : ''"
+                :append-icon="valid ? 'mdi-check' : ''"
+                label="last name">
+              </v-text-field>
+            </validation-provider>
 
-        {{ this.$store.state.user.counter }}
+            <!--     E-mail       -->
+            <validation-provider v-slot="{ errors , valid }" name="email" rules="required|email">
+              <v-text-field
+                v-model="email"
+                :error-messages="errors"
+                :color="valid ? 'green' : ''"
+                :append-icon="valid ? 'mdi-check' : ''"
+                prepend-inner-icon="mdi-email-outline"
+                label="E-mail">
+              </v-text-field>
+            </validation-provider>
 
-        <v-btn color="primary" class="float-left my-6 mx-5">Register</v-btn>
-        <v-btn color="accent" class="float-left my-6" to="/login" nuxt>Login</v-btn>
+            <!-- Password -->
+            <validation-provider v-slot="{ errors , valid }" name="password" rules="required|min:8">
+              <v-text-field v-model="password"
+                            :error-messages="errors"
+                            :color="valid ? 'green' : ''"
+                            :append-icon="valid ? 'mdi-check' : ''"
+                            label="Password"
+                            prepend-inner-icon="mdi-lock"
+                            type="password">
+              </v-text-field>
+            </validation-provider>
 
+            <!-- Password Confirm -->
+            <validation-provider v-slot="{ errors , valid }" name="confirmPassword" rules="required|confirmed:password">
+              <v-text-field v-model="confirmPassword"
+                            :error-messages="errors"
+                            :color="valid ? 'green' : ''"
+                            :append-icon="valid ? 'mdi-check' : ''"
+                            label="Confirm Password"
+                            prepend-inner-icon="mdi-lock-check"
+                            type="password">
+              </v-text-field>
+            </validation-provider>
+
+            <!--     Register Button       -->
+            <v-btn
+                   color="primary"
+                   type="submit"
+                   class="float-left my-6 mx-5">
+              Register
+            </v-btn>
+
+            <!--     Login Button       -->
+            <v-btn color="accent" class="float-left my-6" to="/login" nuxt>Login</v-btn>
+
+          </form>
+        </validation-observer>
       </v-card-text>
     </v-card>
   </v-col>
 </template>
 
 <script>
+
+import {ValidationProvider, ValidationObserver} from "vee-validate";
+
 export default {
-  name: "register",
-  head:{
+  name      : "register",
+  auth      : 'guest',
+  components: {
+    ValidationObserver,
+    ValidationProvider
+  },
+  data      : () => {
+    return {
+      firstName      : '',
+      lastName       : '',
+      email          : '',
+      password       : '',
+      confirmPassword: '',
+    }
+  },
+  head      : {
     title: 'Register'
   },
-  mounted() {
-    this.$store.commit('user/add');
+  methods   : {
+    async submit() {
+      let result = this.$axios.post('users/register');
+    }
   }
 }
 </script>

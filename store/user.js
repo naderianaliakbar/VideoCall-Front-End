@@ -1,10 +1,8 @@
 export const state = () => ({
   email : '',
-  counter : 0
+  name : ''
 })
 
 export const mutations = {
-  add(state, text) {
-    state.counter++;
-  }
+
 }

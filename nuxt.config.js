@@ -24,7 +24,8 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    { src: '~/plugins/persistedState.client.js' }
+    '~/plugins/persistedState.client.js',
+    '~/plugins/vee-validate.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -39,7 +40,10 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [],
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/auth-next',
+  ],
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
@@ -60,8 +64,23 @@ export default {
     }
   },
 
+  router: {
+    middleware: ['auth']
+  },
+
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {
+    transpile: ['vee-validate/dist/rules']
+  },
+
+  axios: {
+    baseUrl : 'http://localhost:5000/api/v1/',
+    proxy  : false,
+  },
+
+  proxy: {
+    '/api/v1/': {target: "http://localhost:5000/api/v1/", pathRewrite: {'^/api/v1/': '/api/v1/'}, changeOrigin: true}
+  },
 
   server: {
     host: '0.0.0.0',
