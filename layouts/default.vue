@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import {localize} from "vee-validate";
+
 export default {
   name: 'DefaultLayout',
   data() {
@@ -54,13 +56,14 @@ export default {
   methods: {
     setLayoutLanguage() {
       this.$nuxt.$i18n.setLocale(this.$store.state.user.language);
+      localize(this.$store.state.user.language);
       setTimeout(() => {
         this.$vuetify.rtl = (this.directionOfLanguage === 'rtl');
         this.render       = true;
       }, 50);
     },
     changeLanguage(lange) {
-      this.$store.commit('user/changeLanguage', lange)
+      this.$store.commit('user/changeLanguage', lange);
       this.setLayoutLanguage();
     }
   }
