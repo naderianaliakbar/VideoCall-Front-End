@@ -15,7 +15,8 @@ export default {
       {name: 'format-detection', content: 'telephone=no'}
     ],
     link         : [
-      {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'}
+      {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'},
+      {rel: 'stylesheet', href: '/IRANSans/css/fontiran.css'}
     ]
   },
 
@@ -25,8 +26,7 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '~/plugins/persistedState.client.js',
-    '~/plugins/vee-validate.js',
-    '~/plugins/i18n.js'
+    '~/plugins/vee-validate.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -62,11 +62,15 @@ export default {
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
+    treeShake      : true,
+    defaultAssets  : {
+      font: {
+        family: 'IRANSans'
+      }
+    },
     theme          : {
-      dark         : true,
-      treeShake    : true,
-      defaultAssets: false,
-      themes       : {
+      dark  : true,
+      themes: {
         dark: {
           primary  : '#F44336',
           accent   : colors.grey.darken3,

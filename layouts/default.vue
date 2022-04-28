@@ -11,9 +11,7 @@
       </v-row>
     </v-app-bar>
     <v-main class="mt-1">
-      <v-content>
-        <Nuxt/>
-      </v-content>
+      <Nuxt/>
     </v-main>
     <v-footer class="mx-1">
       <label @click="changeLanguage('en')" class="v-card--link">English</label>
