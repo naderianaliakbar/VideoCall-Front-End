@@ -3,10 +3,12 @@
     <v-app-bar app>
       <v-row class="d-flex justify-lg-space-around mx-1">
         <!--   Logo   -->
-        <v-img class=""
-               max-width="150px"
-               src="mainLogo.svg" sizes="10">
-        </v-img>
+        <nuxt-link to="/">
+          <v-img class=""
+                 max-width="150px"
+                 src="mainLogo.svg" sizes="10">
+          </v-img>
+        </nuxt-link>
         <v-spacer></v-spacer>
       </v-row>
     </v-app-bar>
@@ -42,6 +44,9 @@ export default {
     directionOfLanguage() {
       return this.$nuxt.$i18n.localeProperties.dir;
     }
+  },
+  mounted() {
+
   },
   created() {
     this.setLayoutLanguage();

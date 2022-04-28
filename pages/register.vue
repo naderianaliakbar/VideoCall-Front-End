@@ -109,6 +109,9 @@ export default {
   head      : {
     title: 'Register'
   },
+  mounted() {
+
+  },
   methods   : {
     async submit() {
       let result = this.$axios.post('users/register');
