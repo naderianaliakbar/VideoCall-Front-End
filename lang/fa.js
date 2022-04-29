@@ -20,6 +20,7 @@ let messages = {
   LOGGING_IN         : 'در حال ورود',
   SEARCH_FOR         : 'جستجو برای',
   REGISTER_SUCCESSFUL: 'شما با موفقیت ثبت نام شدید',
+  CLOSE              : 'بستن'
 };
 
 export default messages;

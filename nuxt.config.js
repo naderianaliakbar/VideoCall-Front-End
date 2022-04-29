@@ -26,7 +26,8 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     '~/plugins/persistedState.client.js',
-    '~/plugins/vee-validate.js'
+    '~/plugins/vee-validate.js',
+    '~/plugins/notifier.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -42,6 +43,41 @@ export default {
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
   ],
+  // auth
+  auth: {
+    strategies: {
+      google: {
+        clientId           : '',
+        redirectUri        : '',
+        codeChallengeMethod: '',
+        responseType       : 'code',
+        grantType          : 'google',
+        endpoints          : {
+          token   : '/loginByGoogle',
+          userInfo: '/user'
+        },
+        user               : {
+          property : 'user',
+          autoFetch: false
+        }
+      },
+      local : {
+        token    : {
+          property: 'token',
+          global  : true,
+        },
+        user     : {
+          property : 'user',
+          autoFetch: true
+        },
+        endpoints: {
+          login : {url: 'login', method: 'post'},
+          user  : {url: 'user'},
+          logout: {url: 'logout', method: 'post'}
+        }
+      }
+    }
+  },
 
   // i18n
   i18n: {
@@ -82,7 +118,7 @@ export default {
           warning  : colors.amber.base,
           error    : colors.deepOrange.accent4,
           success  : colors.green.accent3
-        }
+        },
       }
     }
   },

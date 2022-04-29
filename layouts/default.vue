@@ -1,5 +1,6 @@
 <template>
   <v-app v-if="render">
+    <Snackbar />
     <v-app-bar app>
       <v-row class="d-flex justify-lg-space-around mx-1">
         <!--   Logo   -->
@@ -24,7 +25,8 @@
 </template>
 
 <script>
-import {localize} from "vee-validate";
+import {localize}     from "vee-validate";
+
 
 export default {
   name: 'DefaultLayout',
@@ -65,7 +67,7 @@ export default {
     changeLanguage(lange) {
       this.$store.commit('user/changeLanguage', lange);
       this.setLayoutLanguage();
-    }
+    },
   }
 }
 </script>

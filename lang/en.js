@@ -21,6 +21,7 @@ let messages = {
   LOGGING_IN         : 'Logging in',
   SEARCH_FOR         : 'Search For',
   REGISTER_SUCCESSFUL: 'You have successfully registered',
+  CLOSE              : 'Close'
 };
 
 export default messages;
