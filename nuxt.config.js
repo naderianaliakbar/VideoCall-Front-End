@@ -71,9 +71,9 @@ export default {
           autoFetch: true
         },
         endpoints: {
-          login : {url: 'login', method: 'post'},
-          user  : {url: 'user'},
-          logout: {url: 'logout', method: 'post'}
+          login : {url: 'users/login', method: 'post'},
+          user  : {url: 'users/me'},
+          logout: {url: 'users/logout', method: 'post'}
         }
       }
     }
@@ -133,8 +133,7 @@ export default {
   },
 
   axios: {
-    baseUrl: 'http://localhost:5000/api/v1/',
-    proxy  : false,
+    baseUrl: process.env.SITE_URL + '/api/v1/',
   },
 
   proxy: {

@@ -70,9 +70,9 @@
 
             <!--     Register Button       -->
             <v-btn
-                   color="primary"
-                   type="submit"
-                   class="float-left my-6 mx-5">
+              color="primary"
+              type="submit"
+              class="float-left my-6 mx-5">
               {{ $t(`REGISTER`) }}
             </v-btn>
 
@@ -93,6 +93,7 @@ import {ValidationProvider, ValidationObserver} from "vee-validate";
 export default {
   name      : "register",
   auth      : 'guest',
+  middleware: 'auth',
   components: {
     ValidationObserver,
     ValidationProvider
@@ -112,9 +113,44 @@ export default {
   mounted() {
 
   },
-  methods   : {
+  methods: {
     async submit() {
-      let result = this.$axios.post('users/register');
+      let result = this.$axios.post('users/register', {
+        firstName: this.firstName,
+        lastName : this.lastName,
+        email    : this.email,
+        password : this.password,
+      }).then(response => {
+        this.loading = false;
+        this.$auth.setUserToken(response.data.token);
+        this.$notifier.showMessage({
+          content: this.$t(`REGISTER_SUCCESSFUL`),
+          color  : 'success'
+        });
+      }).catch(({response}) => {
+        this.loading = false;
+        if (response.status) {
+          switch (response.status) {
+            case 406:
+              this.$notifier.showMessage({
+                content: this.$t(`EMAIL_EXISTS`),
+                color  : 'error'
+              });
+              break;
+            case 500 || 504:
+              this.$notifier.showMessage({
+                content: this.$t(`REQUEST_FAILED`),
+                color  : 'error'
+              });
+              break;
+          }
+        } else {
+          this.$notifier.showMessage({
+            content: this.$t(`REQUEST_FAILED`),
+            color  : 'error'
+          });
+        }
+      });
     }
   }
 }

@@ -18,6 +18,7 @@ let messages = {
   LOGIN_SUCCESSFUL   : 'You logged in successfully',
   LOGIN_WRONG_DATA   : 'The information entered is incorrect',
   REQUEST_FAILED     : 'An error occurred. Please try again',
+  EMAIL_EXISTS       : 'There is a user with this email. Please enter another email',
   LOGGING_IN         : 'Logging in',
   SEARCH_FOR         : 'Search For',
   REGISTER_SUCCESSFUL: 'You have successfully registered',

@@ -77,38 +77,36 @@ export default {
     };
   },
   mounted() {
-    this.$notifier.showMessage({
-      content: "YAY Our Plugin worked Successfully!",
-      color  : "error"
-    });
-    this.$notifier.showMessage({
-      content: "YAY Our Plugin worked Successfully! 1",
-      color  : "error"
-    });
+    console.log(this.$auth.loggedIn);
   },
   methods: {
     async submit() {
       this.loading = true;
+
       await this.$auth.loginWith('local', {
-        data   : {
+        data: {
           email   : this.email,
           password: this.password
-        },
-        headers: {
-          'Content-type': 'application/json'
         }
       }).then(response => {
-        this.formLoader = false;
-        this.$auth.setUserToken(response.data.token);
+        this.loading = false;
+        // set notifier
+        this.$notifier.showMessage({
+          content: this.$t(`LOGIN_SUCCESSFUL`),
+          color  : 'success'
+        });
+        // redirect to dashboard
         this.$router.push({
-          path: "/user-dashboard"
+          path: "/dashboard"
         })
       }).catch(({response}) => {
-        this.formLoader = false;
-        if (response.status == 401) {
-          this.$toast.error(this.$t(`LOGIN_WRONG_DATA`));
-        } else if (response.status == 500 || response.status == 504) {
-          this.$toast.error(this.$t(`REQUEST_FAILED`));
+        this.loading = false;
+        // set notifier
+        if (response.status === 401) {
+          this.$notifier.showMessage({
+            content: this.$t(`LOGIN_WRONG_DATA`),
+            color  : 'error'
+          });
         }
       });
     }
