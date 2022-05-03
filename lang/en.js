@@ -22,7 +22,13 @@ let messages = {
   LOGGING_IN         : 'Logging in',
   SEARCH_FOR         : 'Search For',
   REGISTER_SUCCESSFUL: 'You have successfully registered',
-  CLOSE              : 'Close'
+  CLOSE              : 'Close',
+  DASHBOARD          : 'Dashboard',
+  CONTACTS           : 'Contacts',
+  SETTINGS           : 'Settings',
+  NETWORK_OFF        : 'Internet connection disconnected',
+  RECONNECTING       : 'Reconnecting',
+  CONNECTED          : 'Connected',
 };
 
 export default messages;

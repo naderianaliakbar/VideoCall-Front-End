@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <div class="ma-0 pa-0">
     <v-snackbar v-for="(item,index) in list"
                 :key="index"
                 v-model="item.show"
@@ -14,7 +14,7 @@
         </v-btn>
       </template>
     </v-snackbar>
-  </v-row>
+  </div>
 </template>
 
 <script>

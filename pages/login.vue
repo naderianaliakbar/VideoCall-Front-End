@@ -77,7 +77,7 @@ export default {
     };
   },
   mounted() {
-    console.log(this.$auth.loggedIn);
+
   },
   methods: {
     async submit() {
@@ -95,6 +95,8 @@ export default {
           content: this.$t(`LOGIN_SUCCESSFUL`),
           color  : 'success'
         });
+
+
         // redirect to dashboard
         this.$router.push({
           path: "/dashboard"

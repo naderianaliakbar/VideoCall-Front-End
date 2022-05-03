@@ -21,7 +21,13 @@ let messages = {
       LOGGING_IN         : 'در حال ورود',
       SEARCH_FOR         : 'جستجو برای',
       REGISTER_SUCCESSFUL: 'شما با موفقیت ثبت نام شدید',
-      CLOSE              : 'بستن'
+      CLOSE              : 'بستن',
+      DASHBOARD          : 'داشبورد کاربری',
+      CONTACTS           : 'مخاطبین',
+      SETTINGS           : 'تنظیمات',
+      NETWORK_OFF        : 'اتصال اینترنت قطع شده است',
+      RECONNECTING       : 'در حال اتصال مجدد',
+      CONNECTED          : 'متصل شد',
     }
 ;
 

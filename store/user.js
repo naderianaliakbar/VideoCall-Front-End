@@ -3,6 +3,7 @@ export const state = () => ({
   firstName: '',
   lastName : '',
   language : 'fa',
+  color    : '',
 })
 
 export const mutations = {
@@ -14,4 +15,7 @@ export const mutations = {
     state.lastName  = payload.lastName;
     state.email     = payload.email;
   },
+  setUserColor(state, color) {
+    state.color = color;
+  }
 }

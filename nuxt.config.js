@@ -3,7 +3,7 @@ import colors from 'vuetify/es5/util/colors'
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - Exoroya',
+    titleTemplate: 'Exoroya',
     title        : 'Exoroya',
     htmlAttrs    : {
       lang: 'en'
@@ -28,6 +28,7 @@ export default {
     '~/plugins/persistedState.client.js',
     '~/plugins/vee-validate.js',
     '~/plugins/notifier.js',
+    '~/plugins/global.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
