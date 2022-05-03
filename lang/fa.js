@@ -1,6 +1,6 @@
 let messages = {
       APP_NAME           : 'ExoRoya',
-      HOME               : 'خانه',
+      HOME               : 'صفحه اصلی',
       LOGIN              : 'ورود',
       REGISTER           : 'ثبت نام',
       LOGOUT             : 'خروج',
@@ -22,12 +22,18 @@ let messages = {
       SEARCH_FOR         : 'جستجو برای',
       REGISTER_SUCCESSFUL: 'شما با موفقیت ثبت نام شدید',
       CLOSE              : 'بستن',
-      DASHBOARD          : 'داشبورد کاربری',
+      DASHBOARD          : 'داشبورد',
       CONTACTS           : 'مخاطبین',
       SETTINGS           : 'تنظیمات',
       NETWORK_OFF        : 'اتصال اینترنت قطع شده است',
       RECONNECTING       : 'در حال اتصال مجدد',
       CONNECTED          : 'متصل شد',
+      STATISTICS         : 'آمار و اطلاعات',
+      ALL_CALLS          : 'تمامی تماس‌ها',
+      CALLS_MADE         : 'تماس‌های گرفته شده',
+      CALLS_RECEIVED     : 'تماس‌های دریافتی',
+      TOTAL_TIME_OF_CALLS: 'مجموع زمان تمام تماس‌ها',
+      NOT_FOUND          : 'پیدا نشد',
     }
 ;
 

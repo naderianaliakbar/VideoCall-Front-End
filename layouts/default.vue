@@ -1,21 +1,26 @@
 <template>
   <v-app v-if="render">
+    <!-- Toast  -->
     <Snackbar/>
+
+    <!-- Network identifier  -->
     <v-overlay :value="!connected" opacity="1">
       <div v-if="!connected">
         <v-row class="d-flex justify-center my-3">
           <v-icon class="d-block" color="red" size="100">mdi-network-off-outline</v-icon>
         </v-row>
-        <h2>{{ $t(`NETWORK_OFF`) }}</h2>
-        <h2>{{ $t(`RECONNECTING`) }}...</h2>
+        <h3>{{ $t(`NETWORK_OFF`) }}</h3>
+        <h3>{{ $t(`RECONNECTING`) }}...</h3>
       </div>
       <div v-if="connected">
         <v-row class="d-flex justify-center my-3">
           <v-icon class="d-block" color="green" size="100">mdi-network-outline</v-icon>
         </v-row>
-        <h2>{{ $t(`CONNECTED`) }}</h2>
+        <h3>{{ $t(`CONNECTED`) }}</h3>
       </div>
     </v-overlay>
+
+    <!--  Navigation drawer  -->
     <v-navigation-drawer
       :right="$nuxt.$i18n.localeProperties.dir === 'rtl'"
       v-model="drawerMenu"
@@ -63,10 +68,14 @@
 
       </v-list>
     </v-navigation-drawer>
+
+    <!--  Toolbar  -->
     <v-app-bar absolute app>
+      <!--   Menu Icon   -->
       <v-btn class="mx-1" @click="drawerMenu = true" icon>
         <v-icon>mdi-menu</v-icon>
       </v-btn>
+
       <!--   Logo   -->
       <nuxt-link to="/">
         <v-img class=""
@@ -74,11 +83,15 @@
                src="mainLogo.svg" sizes="10">
         </v-img>
       </nuxt-link>
+
       <v-spacer></v-spacer>
 
+      <!--   LOGIN LINK BUTTON  -->
       <v-btn v-if="!$auth.loggedIn" to="/login" text nuxt>{{ $t(`LOGIN`) }}</v-btn>
+      <!--   REGISTER LINK BUTTON  -->
       <v-btn v-if="!$auth.loggedIn" to="/register" text nuxt>{{ $t(`REGISTER`) }}</v-btn>
 
+      <!--   DASHBOARD LINK BUTTON  -->
       <nuxt-link v-if="$auth.loggedIn" to="/dashboard">
         <ContactAvatar :avatar="$auth.user.avatar"
                        :name="$auth.user.firstName"
@@ -86,9 +99,13 @@
       </nuxt-link>
 
     </v-app-bar>
+
+    <!--  MAIN  -->
     <v-main class="">
       <Nuxt/>
     </v-main>
+
+    <!--  FOOTER  -->
     <v-footer class="mx-1">
       <label @click="changeLanguage('en')" class="v-card--link">English</label>
       &nbsp; | &nbsp;

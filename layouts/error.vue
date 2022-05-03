@@ -9,7 +9,7 @@
         <!--   Error 404 Not Found     -->
         <h1 v-if="error.statusCode === 404">
           <span class="red--text text-h2">404 | </span>
-          &nbsp; Not Found
+          &nbsp; {{ $t(`NOT_FOUND`) }}
         </h1>
         <h1 v-else>
           <span class="red--text text--accent-1 text-h2">Error | </span>
@@ -22,7 +22,7 @@
                x-large
                outlined
                nuxt>
-          Home
+          {{ $t(`HOME`) }}
         </v-btn>
 
       </v-col>

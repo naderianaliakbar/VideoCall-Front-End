@@ -29,6 +29,12 @@ let messages = {
   NETWORK_OFF        : 'Internet connection disconnected',
   RECONNECTING       : 'Reconnecting',
   CONNECTED          : 'Connected',
+  STATISTICS         : 'Statistics',
+  ALL_CALLS          : 'All Cals',
+  CALLS_MADE         : 'Calls made',
+  CALLS_RECEIVED     : 'Calls received',
+  TOTAL_TIME_OF_CALLS: 'Total time of all calls',
+  NOT_FOUND          : 'Not Found',
 };
 
 export default messages;
