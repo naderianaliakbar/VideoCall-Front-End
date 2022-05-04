@@ -3,7 +3,7 @@
     <!--  Can Edit  -->
     <v-hover v-if="edit" v-slot="{ hover }">
       <v-avatar :size="size" :color="(color && !avatar) ? color : ''">
-        <v-img v-if="avatar" :src="avatar"></v-img>
+        <v-img v-if="avatar" :src="SITE_URL + '/avatars/' + avatar"></v-img>
         <span class="white--text"
               :class="classes"
               :style="'font-size:'+(size/2)+'px'"
@@ -13,8 +13,16 @@
           <v-overlay :value="hover" opacity="0.7" absolute>
             <div class="d-flex transition-fast-in-fast-out darken-2 v-card--reveal text-h2 white--text"
                  style="cursor: pointer">
-              <v-icon large>mdi-image-edit-outline</v-icon>
-              <v-icon v-if="avatar" class="mx-1 mx-md-2" large>mdi-close-outline</v-icon>
+              <v-file-input
+                class="mt-n3"
+                :class="directionOfLanguage === 'rtl' ? 'ml-n2' : 'mr-n2'"
+                accept="image/png, image/jpeg, image/gif"
+                prepend-icon="mdi-image-edit-outline"
+                @change="uploadAvatar"
+                hide-details
+                hide-input>
+              </v-file-input>
+              <v-icon v-if="avatar" class="mx-1 mx-md-2">mdi-close-outline</v-icon>
             </div>
           </v-overlay>
         </v-expand-transition>
@@ -23,7 +31,7 @@
 
     <!--  Can't Edit  -->
     <v-avatar v-if="!edit" :size="size" :color="(color && !avatar) ? color : ''">
-      <v-img v-if="avatar" :src="avatar"></v-img>
+      <v-img v-if="avatar" :src="SITE_URL + '/avatars/' + avatar"></v-img>
       <span class="white--text"
             :class="classes"
             :style="'font-size:'+(size/2)+'px'"
@@ -34,9 +42,61 @@
 </template>
 
 <script>
+
+import mime from "mime";
+
 export default {
-  name : "ContactAvatar",
-  props: ['name', 'color', 'avatar', 'size', 'classes', 'edit']
+  name   : "ContactAvatar",
+  props  : ['name', 'color', 'avatar', 'size', 'classes', 'edit'],
+  data   : () => {
+    return {
+      avatarFile: '',
+    };
+  },
+  methods: {
+    async uploadAvatar(file) {
+      let validExt = ['jpg', 'png', 'gif', 'jpeg'];
+      let mime     = require('mime');
+
+      // check maximum size for upload
+      if (!validExt.includes(mime.getExtension(file.type))) {
+        console.log(mime.getExtension(file.type));
+        this.$notifier.showMessage({
+          content: this.$t(`INVALID_EXT`),
+          color  : 'error'
+        });
+      } else if (file.size > 200000) {
+        this.$notifier.showMessage({
+          content: this.$t(`MAXIMUM_UPLOAD`),
+          color  : 'error'
+        });
+      } else {
+        let fileReader    = new FileReader();
+        fileReader.onload = async () => {
+          let result = await this.$axios.put('users/uploadAvatar', {avatar: fileReader.result}).then(async response => {
+            await this.$auth.fetchUser();
+            this.$notifier.showMessage({
+              content: this.$t(`UPLOADED`),
+              color  : 'success'
+            });
+          });
+        };
+        fileReader.readAsDataURL(file);
+      }
+    }
+    ,
+  },
+  created() {
+
+  },
+  computed: {
+    directionOfLanguage() {
+      return this.$nuxt.$i18n.localeProperties.dir;
+    },
+    SITE_URL() {
+      return process.env.SITE_URL;
+    }
+  }
 }
 </script>
 

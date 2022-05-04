@@ -41,6 +41,10 @@ let messages = {
       ARE_YOU_SURE       : 'آیا مطئمن هستید؟',
       YES                : 'بله',
       NO                 : 'خیر',
+      EDIT_PROFILE       : 'ویرایش پروفایل',
+      MAXIMUM_UPLOAD     : 'بیشترین حجم قابل آپلود 2 مگابایت است',
+      UPLOADED           : 'آپلود شد',
+      INVALID_EXT        : 'فرمت فایل انتخاب شده صحیح نیست',
     }
 ;
 

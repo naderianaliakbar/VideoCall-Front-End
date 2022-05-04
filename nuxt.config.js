@@ -137,8 +137,8 @@ export default {
     baseUrl: process.env.SITE_URL + '/api/v1/',
   },
 
-  proxy: {
-    '/api/v1/': {target: "http://localhost:5000/api/v1/", pathRewrite: {'^/api/v1/': '/api/v1/'}, changeOrigin: true}
+  env: {
+    SITE_URL: process.env.SITE_URL
   },
 
   server: {

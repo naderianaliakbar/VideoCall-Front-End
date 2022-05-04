@@ -4,23 +4,37 @@
       <h1>
         {{ $t(`DASHBOARD`) }}
         <!--    Button edit mode    -->
-        <v-btn :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
-               @click="profileEditMode = !profileEditMode"
-               class="mt-1"
-               outlined
-               icon>
-          <v-icon v-if="!profileEditMode">mdi-account-edit-outline</v-icon>
-          <v-icon v-if="profileEditMode">mdi-account-edit</v-icon>
-        </v-btn>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
+                   @click="profileEditMode = !profileEditMode"
+                   v-bind="attrs"
+                   v-on="on"
+                   class="mt-1"
+                   outlined
+                   icon>
+              <v-icon v-if="!profileEditMode">mdi-account-edit-outline</v-icon>
+              <v-icon v-if="profileEditMode">mdi-account-edit</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t(`EDIT_PROFILE`) }}</span>
+        </v-tooltip>
 
         <!--    Button logout    -->
-        <v-btn class="mt-1 mx-2"
-               :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
-               @click="logoutDialog = true"
-               outlined
-               icon>
-          <v-icon>mdi-logout-variant</v-icon>
-        </v-btn>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn class="mt-1 mx-2"
+                   :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
+                   @click="logoutDialog = true"
+                   v-bind="attrs"
+                   v-on="on"
+                   outlined
+                   icon>
+              <v-icon>mdi-logout-variant</v-icon>
+            </v-btn>
+          </template>
+          <span>{{ $t(`LOGOUT`) }}</span>
+        </v-tooltip>
 
         <!--    Logout Dialog    -->
         <v-dialog v-model="logoutDialog" width="325px" transition="scale-transition">

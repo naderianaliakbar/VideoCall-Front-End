@@ -42,6 +42,10 @@ let messages = {
   ARE_YOU_SURE       : 'Are you sure?',
   YES                : 'Yes',
   NO                 : 'No',
+  EDIT_PROFILE       : 'Edit Profile',
+  MAXIMUM_UPLOAD     : 'The maximum uploadable size is 2 MB.',
+  UPLOADED           : 'Uploaded',
+  INVALID_EXT        : 'The selected file format is incorrect',
 };
 
 export default messages;
