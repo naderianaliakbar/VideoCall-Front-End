@@ -1,5 +1,6 @@
 import {extend, localize}                                   from "vee-validate";
 import {required, email, confirmed, min, max, alpha_spaces} from "vee-validate/dist/rules";
+import validateColor                                        from "validate-color";
 
 const dictionary = {
   en: {
@@ -11,6 +12,7 @@ const dictionary = {
       max         : (_, {length}) => `This field must be at less than ${length} characters`,
       phone       : () => `Phone is not valid`,
       alpha_spaces: (_, {field}) => `value is not valid`,
+      color       : () => "Enter a Valid Color or Select one of templates"
     },
   },
 
@@ -23,6 +25,7 @@ const dictionary = {
       max         : (_, {length}) => `مقدار این فیلد نباید بیشتر از  ${length} کاراکتر باشد`,
       phone       : () => `شماره همراه نا معتبر است`,
       alpha_spaces: (_, {field}) => ` مقدار ورودی نامعتبر است`,
+      color       : () => 'یک رنگ معتبر وارد کنید یا یکی از الگوها را انتخاب کنید'
     },
   },
 
@@ -34,6 +37,9 @@ extend("confirmed", confirmed);
 extend("min", min);
 extend("max", max);
 extend("alpha_spaces", alpha_spaces);
+extend("color", (value) => {
+  return validateColor(value);
+})
 
 
 localize(dictionary);

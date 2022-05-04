@@ -2,7 +2,7 @@
   <div>
     <!--  Can Edit  -->
     <v-hover v-if="edit" v-slot="{ hover }">
-      <v-avatar :size="size" :color="color">
+      <v-avatar :size="size" :color="(color && !avatar) ? color : ''">
         <v-img v-if="avatar" :src="avatar"></v-img>
         <span class="white--text"
               :class="classes"
@@ -14,6 +14,7 @@
             <div class="d-flex transition-fast-in-fast-out darken-2 v-card--reveal text-h2 white--text"
                  style="cursor: pointer">
               <v-icon large>mdi-image-edit-outline</v-icon>
+              <v-icon v-if="avatar" class="mx-1 mx-md-2" large>mdi-close-outline</v-icon>
             </div>
           </v-overlay>
         </v-expand-transition>
@@ -21,7 +22,7 @@
     </v-hover>
 
     <!--  Can't Edit  -->
-    <v-avatar v-if="!edit" :size="size" :color="color">
+    <v-avatar v-if="!edit" :size="size" :color="(color && !avatar) ? color : ''">
       <v-img v-if="avatar" :src="avatar"></v-img>
       <span class="white--text"
             :class="classes"

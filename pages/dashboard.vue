@@ -1,8 +1,42 @@
 <template>
   <v-container>
     <v-sheet class="pa-5 rounded-lg">
-      <h1>{{ $t(`DASHBOARD`) }}</h1>
+      <h1>
+        {{ $t(`DASHBOARD`) }}
+        <!--    Button edit mode    -->
+        <v-btn :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
+               @click="profileEditMode = !profileEditMode"
+               class="mt-1"
+               outlined
+               icon>
+          <v-icon v-if="!profileEditMode">mdi-account-edit-outline</v-icon>
+          <v-icon v-if="profileEditMode">mdi-account-edit</v-icon>
+        </v-btn>
 
+        <!--    Button logout    -->
+        <v-btn class="mt-1 mx-2"
+               :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
+               @click="logoutDialog = true"
+               outlined
+               icon>
+          <v-icon>mdi-logout-variant</v-icon>
+        </v-btn>
+
+        <!--    Logout Dialog    -->
+        <v-dialog v-model="logoutDialog" width="325px" transition="scale-transition">
+          <v-card>
+            <v-card-title class="primary">{{ $t(`LOGOUT`) }}</v-card-title>
+            <v-card-text class="text-h6 mt-4">
+              {{ $t(`ARE_YOU_SURE`) }}
+            </v-card-text>
+            <v-card-actions>
+              <v-btn @click="logout" text> {{ $t(`YES`) }}</v-btn>
+              <v-btn @click="logoutDialog = false" text> {{ $t(`NO`) }}</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+      </h1>
       <v-row class="mt-3">
         <v-col cols="3" class="d-flex justify-center">
           <ContactAvatar class="mx-2 my-3 my-md-1"
@@ -13,8 +47,91 @@
                          :color="$auth.user.color"/>
         </v-col>
         <v-col cols="9" class="mt-md-6 justify-center">
-          <h2 class="mt-7">{{ $auth.user.firstName + ' ' + $auth.user.lastName }}</h2>
-          <h2 class="caption">{{ $auth.user.email }}</h2>
+          <!--    Profile edit      -->
+          <validation-observer ref="observer" v-slot="{ invalid }" v-if="profileEditMode">
+            <form @submit.prevent="editProfile">
+              <!--      First Name      -->
+              <validation-provider v-slot="{ errors , valid }" name="first name" rules="required|max:20">
+                <v-text-field
+                  v-model="editForm.firstName"
+                  :counter="20"
+                  :disabled="editProfileLoading"
+                  :error-messages="errors"
+                  :color="valid ? 'green' : ''"
+                  :append-icon="valid ? 'mdi-check' : ''"
+                  :label="$t(`FIRST_NAME`)">
+                </v-text-field>
+              </validation-provider>
+
+              <!--      Last Name      -->
+              <validation-provider v-slot="{ errors , valid }" name="last name" rules="required|max:20">
+                <v-text-field
+                  v-model="editForm.lastName"
+                  :counter="20"
+                  :disabled="editProfileLoading"
+                  :error-messages="errors"
+                  :color="valid ? 'green' : ''"
+                  :append-icon="valid ? 'mdi-check' : ''"
+                  :label="$t(`LAST_NAME`)">
+                </v-text-field>
+              </validation-provider>
+
+              <!--     E-mail       -->
+              <validation-provider v-slot="{ errors , valid }" name="email" rules="required|email">
+                <v-text-field
+                  v-model="editForm.email"
+                  :error-messages="errors"
+                  :disabled="editProfileLoading"
+                  :color="valid ? 'green' : ''"
+                  :append-icon="valid ? 'mdi-check' : ''"
+                  :label="$t(`E_MAIL`)">
+                </v-text-field>
+              </validation-provider>
+
+              <!--     Color       -->
+              <validation-provider v-slot="{ errors , valid }" name="color" rules="required|color">
+                <v-text-field
+                  v-model="editForm.color"
+                  :disabled="editProfileLoading"
+                  :error-messages="errors"
+                  :color="valid ? 'green' : ''"
+                  :append-icon="valid ? 'mdi-check' : ''"
+                  :label="$t(`COLOR`)">
+                  <template v-slot:prepend-inner>
+                    <v-icon @click="colorPickerDialog = true" :color="editForm.color">mdi-square</v-icon>
+                  </template>
+                </v-text-field>
+              </validation-provider>
+
+              <v-btn color="primary"
+                     type="submit"
+                     :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
+                     :loading="editProfileLoading"
+                     :disabled="invalid">
+                {{ $t(`EDIT`) }}
+              </v-btn>
+            </form>
+          </validation-observer>
+
+          <!--     Color Picker Dialog     -->
+          <v-dialog v-model="colorPickerDialog"
+                    width="325"
+                    transition="dialog-bottom-transition">
+            <v-card>
+              <v-color-picker
+                class="ma-2"
+                swatches-max-height="200px"
+                @input="setColor"
+                show-swatches>
+              </v-color-picker>
+            </v-card>
+          </v-dialog>
+
+          <!--    Profile      -->
+          <h2 class="mt-7" v-if="!profileEditMode">
+            {{ $auth.user.firstName + ' ' + $auth.user.lastName }}
+          </h2>
+          <h2 class="caption" v-if="!profileEditMode">{{ $auth.user.email }}</h2>
         </v-col>
       </v-row>
 
@@ -157,20 +274,82 @@
 </template>
 
 <script>
+
+import {ValidationProvider, ValidationObserver} from "vee-validate";
+
 export default {
-  name: "dashboard",
-  auth: true,
-  data: () => {
+  name      : "dashboard",
+  auth      : true,
+  components: {
+    ValidationObserver,
+    ValidationProvider
+  },
+  data      : () => {
     return {
-      statisticsLoading: false
+      statisticsLoading : false,
+      profileEditMode   : false,
+      editForm          : {
+        firstName: '',
+        lastName : '',
+        email    : '',
+        color    : ''
+      },
+      colorPickerDialog : false,
+      logoutDialog      : false,
+      editProfileLoading: false,
     };
   },
   mounted() {
-
+    this.editForm.firstName = this.$auth.user.firstName;
+    this.editForm.lastName  = this.$auth.user.lastName;
+    this.editForm.email     = this.$auth.user.email;
+    this.editForm.color     = this.$auth.user.color;
   },
   computed: {
     directionOfLanguage() {
       return this.$nuxt.$i18n.localeProperties.dir;
+    }
+  },
+  methods : {
+    async editProfile() {
+      this.editProfileLoading = true;
+      let result              = this.$axios.put('users/me', this.editForm).then(async response => {
+        this.editProfileLoading = false;
+        this.$notifier.showMessage({
+          content: this.$t(`EDIT_SUCCESSFUL`),
+          color  : 'success'
+        });
+        await this.$auth.fetchUser();
+      }).catch(({response}) => {
+        this.editProfileLoading = false;
+        if (response.status) {
+          switch (response.status) {
+            case 406:
+              this.$notifier.showMessage({
+                content: this.$t(`EMAIL_EXISTS`),
+                color  : 'error'
+              });
+              break;
+            case 500 || 504:
+              this.$notifier.showMessage({
+                content: this.$t(`REQUEST_FAILED`),
+                color  : 'error'
+              });
+              break;
+          }
+        } else {
+          this.$notifier.showMessage({
+            content: this.$t(`REQUEST_FAILED`),
+            color  : 'error'
+          });
+        }
+      });
+    },
+    setColor(color) {
+      this.editForm.color = color.hex;
+    },
+    logout() {
+      this.$auth.logout();
     }
   }
 }

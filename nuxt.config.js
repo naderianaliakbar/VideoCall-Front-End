@@ -72,9 +72,9 @@ export default {
           autoFetch: true
         },
         endpoints: {
-          login : {url: 'users/login', method: 'post'},
-          user  : {url: 'users/me'},
-          logout: {url: 'users/logout', method: 'post'}
+          login : {url: 'auth/login', method: 'post'},
+          user  : {url: 'auth/me'},
+          logout: {url: 'auth/logout', method: 'post'}
         }
       }
     }

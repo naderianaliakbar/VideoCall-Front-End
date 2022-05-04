@@ -10,7 +10,7 @@ let messages = {
       SIGN_IN_WITH       : 'ورود با',
       FIRST_NAME         : 'نام',
       LAST_NAME          : 'نام خانوادگی',
-      ACCEPT_TERMS       : 'با تمام قوانین و مقررات وبسایت ExoRoya موافقت میکنم.',
+      ACCEPT_TERMS       : 'با تمام قوانین و مقررات وبسایت ExoRoya موافقت میکنم',
       OR                 : 'یا',
       SELECT             : 'انتخاب',
       SEARCH             : 'جستجو',
@@ -34,6 +34,13 @@ let messages = {
       CALLS_RECEIVED     : 'تماس‌های دریافتی',
       TOTAL_TIME_OF_CALLS: 'مجموع زمان تمام تماس‌ها',
       NOT_FOUND          : 'پیدا نشد',
+      SUBMIT             : 'ثبت',
+      EDIT               : 'ویرایش',
+      COLOR              : 'رنگ',
+      EDIT_SUCCESSFUL    : 'ویرایش انجام شد',
+      ARE_YOU_SURE       : 'آیا مطئمن هستید؟',
+      YES                : 'بله',
+      NO                 : 'خیر',
     }
 ;
 

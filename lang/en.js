@@ -35,6 +35,13 @@ let messages = {
   CALLS_RECEIVED     : 'Calls received',
   TOTAL_TIME_OF_CALLS: 'Total time of all calls',
   NOT_FOUND          : 'Not Found',
+  SUBMIT             : 'Submit',
+  EDIT               : 'Edit',
+  COLOR              : 'Color',
+  EDIT_SUCCESSFUL    : 'Edited',
+  ARE_YOU_SURE       : 'Are you sure?',
+  YES                : 'Yes',
+  NO                 : 'No',
 };
 
 export default messages;

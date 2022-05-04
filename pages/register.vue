@@ -9,38 +9,38 @@
           <form @submit.prevent="submit">
 
             <!--      First Name      -->
-            <validation-provider v-slot="{ errors , valid }" name="first name" rules="required|max:20|alpha_spaces">
-              <v-text-field
-                v-model="firstName"
-                :counter="20"
-                :error-messages="errors"
-                :color="valid ? 'green' : ''"
-                :append-icon="valid ? 'mdi-check' : ''"
-                :label="$t(`FIRST_NAME`)">
+            <validation-provider v-slot="{ errors , valid }" name="first name" rules="required|max:20">
+              <v-text-field v-model="firstName"
+                            :counter="20"
+                            :disabled="loading"
+                            :error-messages="errors"
+                            :color="valid ? 'green' : ''"
+                            :append-icon="valid ? 'mdi-check' : ''"
+                            :label="$t(`FIRST_NAME`)">
               </v-text-field>
             </validation-provider>
 
             <!--      Last Name      -->
-            <validation-provider v-slot="{ errors , valid }" name="last name" rules="required|max:20|alpha_spaces">
-              <v-text-field
-                v-model="lastName"
-                :counter="20"
-                :error-messages="errors"
-                :color="valid ? 'green' : ''"
-                :append-icon="valid ? 'mdi-check' : ''"
-                :label="$t(`LAST_NAME`)">
+            <validation-provider v-slot="{ errors , valid }" name="last name" rules="required|max:20">
+              <v-text-field v-model="lastName"
+                            :counter="20"
+                            :disabled="loading"
+                            :error-messages="errors"
+                            :color="valid ? 'green' : ''"
+                            :append-icon="valid ? 'mdi-check' : ''"
+                            :label="$t(`LAST_NAME`)">
               </v-text-field>
             </validation-provider>
 
             <!--     E-mail       -->
             <validation-provider v-slot="{ errors , valid }" name="email" rules="required|email">
-              <v-text-field
-                v-model="email"
-                :error-messages="errors"
-                :color="valid ? 'green' : ''"
-                :append-icon="valid ? 'mdi-check' : ''"
-                prepend-inner-icon="mdi-email-outline"
-                :label="$t(`E_MAIL`)">
+              <v-text-field v-model="email"
+                            :error-messages="errors"
+                            :disabled="loading"
+                            :color="valid ? 'green' : ''"
+                            :append-icon="valid ? 'mdi-check' : ''"
+                            prepend-inner-icon="mdi-email-outline"
+                            :label="$t(`E_MAIL`)">
               </v-text-field>
             </validation-provider>
 
@@ -48,6 +48,7 @@
             <validation-provider v-slot="{ errors , valid }" name="password" rules="required|min:8">
               <v-text-field v-model="password"
                             :error-messages="errors"
+                            :disabled="loading"
                             :color="valid ? 'green' : ''"
                             :append-icon="valid ? 'mdi-check' : ''"
                             :label="$t(`PASSWORD`)"
@@ -59,6 +60,7 @@
             <!-- Password Confirm -->
             <validation-provider v-slot="{ errors , valid }" name="confirmPassword" rules="required|confirmed:password">
               <v-text-field v-model="confirmPassword"
+                            :disabled="loading"
                             :error-messages="errors"
                             :color="valid ? 'green' : ''"
                             :append-icon="valid ? 'mdi-check' : ''"
@@ -69,10 +71,11 @@
             </validation-provider>
 
             <!--     Register Button       -->
-            <v-btn
-              color="primary"
-              type="submit"
-              class="float-left my-6 mx-5">
+            <v-btn color="primary"
+                   type="submit"
+                   class="float-left my-6 mx-5"
+                   :disabled="invalid"
+                   :loading="loading">
               {{ $t(`REGISTER`) }}
             </v-btn>
 
@@ -105,6 +108,7 @@ export default {
       email          : '',
       password       : '',
       confirmPassword: '',
+      loading        : false,
     }
   },
   head      : {
@@ -115,17 +119,22 @@ export default {
   },
   methods: {
     async submit() {
-      let result = this.$axios.post('users/register', {
+      this.loading = true;
+      let result   = this.$axios.post('auth/register', {
         firstName: this.firstName,
         lastName : this.lastName,
         email    : this.email,
         password : this.password,
-      }).then(response => {
-        this.loading = false;
-        this.$auth.setUserToken(response.data.token);
+      }).then(async response => {
+        await this.$auth.setUserToken(response.data.token);
         this.$notifier.showMessage({
           content: this.$t(`REGISTER_SUCCESSFUL`),
           color  : 'success'
+        });
+        this.loading = false;
+        // redirect user
+        await this.$router.push({
+          path: "/dashboard"
         });
       }).catch(({response}) => {
         this.loading = false;

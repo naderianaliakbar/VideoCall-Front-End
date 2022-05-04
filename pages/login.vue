@@ -11,14 +11,13 @@
 
             <!--     E-mail       -->
             <validation-provider v-slot="{ errors , valid }" name="email" rules="required|email">
-              <v-text-field
-                v-model="email"
-                :error-messages="errors"
-                :color="valid ? 'green' : ''"
-                :append-icon="valid ? 'mdi-check' : ''"
-                :label="$t(`E_MAIL`)"
-                :disabled="loading"
-                prepend-inner-icon="mdi-email-outline">
+              <v-text-field v-model="email"
+                            :error-messages="errors"
+                            :color="valid ? 'green' : ''"
+                            :append-icon="valid ? 'mdi-check' : ''"
+                            :label="$t(`E_MAIL`)"
+                            :disabled="loading"
+                            prepend-inner-icon="mdi-email-outline">
               </v-text-field>
             </validation-provider>
 

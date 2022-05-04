@@ -126,7 +126,7 @@ export default {
       render    : false,
       userMenu  : false,
       drawerMenu: false,
-      connected : false,
+      connected : true,
     }
   },
   watch   : {
