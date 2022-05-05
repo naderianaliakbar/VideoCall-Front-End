@@ -46,6 +46,9 @@ let messages = {
   MAXIMUM_UPLOAD     : 'The maximum uploadable size is 2 MB.',
   UPLOADED           : 'Uploaded',
   INVALID_EXT        : 'The selected file format is incorrect',
+  DELETED            : 'Deleted',
+  ADD_CONTACT        : 'Add a Contact',
+  ADD                : 'Add',
 };
 
 export default messages;

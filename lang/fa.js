@@ -45,6 +45,9 @@ let messages = {
       MAXIMUM_UPLOAD     : 'بیشترین حجم قابل آپلود 2 مگابایت است',
       UPLOADED           : 'آپلود شد',
       INVALID_EXT        : 'فرمت فایل انتخاب شده صحیح نیست',
+      DELETED            : 'حذف شد',
+      ADD_CONTACT        : 'اضافه کردن مخاطب',
+      ADD                : 'اضافه کردن',
     }
 ;
 

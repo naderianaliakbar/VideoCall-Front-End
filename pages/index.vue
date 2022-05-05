@@ -1,9 +1,7 @@
 <template>
-  <v-row>
-   <v-container>
-
-   </v-container>
-  </v-row>
+  <v-sheet class="pa-5 rounded-lg">
+    <h1>ExoRoya</h1>
+  </v-sheet>
 </template>
 
 <script>

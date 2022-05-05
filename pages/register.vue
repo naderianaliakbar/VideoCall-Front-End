@@ -1,10 +1,8 @@
 <template>
-  <v-col cols="12" md="6" offset-md="3" class="d-flex flex-column justify-center align-center">
-    <v-card width="100%">
-      <v-card-title class="justify-center">
-        <span class="text-h4 d-block">{{ $t(`REGISTER`) }}</span>
-      </v-card-title>
-      <v-card-text class="px-5 px-md-16">
+  <v-sheet class="pa-5 rounded-lg">
+    <h1>{{ $t(`REGISTER`) }}</h1>
+    <v-row>
+      <v-col cols="12" md="6" offset-md="3">
         <validation-observer ref="observer" v-slot="{ invalid }">
           <form @submit.prevent="submit">
 
@@ -84,9 +82,9 @@
 
           </form>
         </validation-observer>
-      </v-card-text>
-    </v-card>
-  </v-col>
+      </v-col>
+    </v-row>
+  </v-sheet>
 </template>
 
 <script>

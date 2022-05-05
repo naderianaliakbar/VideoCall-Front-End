@@ -70,9 +70,9 @@
     </v-navigation-drawer>
 
     <!--  Toolbar  -->
-    <v-app-bar absolute app>
+    <v-app-bar height="60px" rounded absolute app>
       <!--   Menu Icon   -->
-      <v-btn class="mx-1" @click="drawerMenu = true" icon>
+      <v-btn @click="drawerMenu = true" icon>
         <v-icon>mdi-menu</v-icon>
       </v-btn>
 
@@ -86,10 +86,21 @@
 
       <v-spacer></v-spacer>
 
-      <!--   LOGIN LINK BUTTON  -->
-      <v-btn v-if="!$auth.loggedIn" to="/login" text nuxt>{{ $t(`LOGIN`) }}</v-btn>
-      <!--   REGISTER LINK BUTTON  -->
-      <v-btn v-if="!$auth.loggedIn" to="/register" text nuxt>{{ $t(`REGISTER`) }}</v-btn>
+      <!--   Dashboard mobile LINK BUTTON  -->
+      <v-tooltip v-if="!$auth.loggedIn" bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn to="/login"
+                 class="mx-1"
+                 v-bind="attrs"
+                 v-on="on"
+                 outlined
+                 nuxt
+                 icon>
+            <v-icon>mdi-account</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ $t(`LOGIN`) }}</span>
+      </v-tooltip>
 
       <!--   DASHBOARD LINK BUTTON  -->
       <nuxt-link v-if="$auth.loggedIn" to="/dashboard">
@@ -101,8 +112,10 @@
     </v-app-bar>
 
     <!--  MAIN  -->
-    <v-main class="">
-      <Nuxt/>
+    <v-main>
+      <v-container>
+        <Nuxt/>
+      </v-container>
     </v-main>
 
     <!--  FOOTER  -->
