@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="pa-5 rounded-lg">
+  <v-sheet class="pa-3 pa-md-5 rounded-lg" min-height="50vh">
     <h1>
       {{ $t(`CONTACTS`) }}
       <!--    Button Add a contact    -->
@@ -77,6 +77,43 @@
       </v-card>
     </v-dialog>
 
+    <!--   List   -->
+    <v-list class="mt-3" nav>
+      <v-list-item v-for="contact in list" :key="contact.email">
+        <v-list-item-avatar>
+          <ContactAvatar :avatar="contact.avatar"
+                         :name="contact.firstName"
+                         :color="contact.color"/>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>{{ contact.firstName + ' ' + contact.lastName }}</v-list-item-title>
+        </v-list-item-content>
+        <v-list-item-icon>
+          <v-btn  class="mx-2" large icon>
+            <v-icon>mdi-phone-outline</v-icon>
+          </v-btn>
+          <v-btn large icon>
+            <v-icon>mdi-video-outline</v-icon>
+          </v-btn>
+        </v-list-item-icon>
+      </v-list-item>
+    </v-list>
+
+    <row v-if="!list.length">
+      <v-row class="d-flex justify-center">
+        <h2 class="d-block">{{ $t(`NO_CONTACT`) }}</h2>
+      </v-row>
+
+      <v-row class="d-flex justify-center my-7">
+        <v-btn color="primary">
+          {{ $t(`ADD_CONTACT`) }}
+        </v-btn>
+      </v-row>
+    </row>
+
+
+
+
   </v-sheet>
 </template>
 
@@ -99,8 +136,8 @@ export default {
       addContactForm   : {
         email: ''
       },
-      list             : []
-    };
+      list             : [],
+    }
   },
   computed  : {
     directionOfLanguage() {
@@ -117,6 +154,8 @@ export default {
           content: this.$t(`CONTACT_ADDED`),
           color  : 'success'
         });
+        await this.getContacts();
+        this.addContactDialog = false;
       }).catch(({response}) => {
         if (response.status) {
           switch (response.status) {
@@ -148,7 +187,6 @@ export default {
       this.$axios.get('users/contacts').then(async response => {
         this.list            = response.data.contacts;
         this.contactsLoading = false;
-        console.log(this.list);
       });
     }
   },
