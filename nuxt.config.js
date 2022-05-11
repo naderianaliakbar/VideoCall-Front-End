@@ -64,8 +64,10 @@ export default {
       },
       local : {
         token    : {
-          property: 'token',
-          global  : true,
+          property  : 'token',
+          global    : true,
+          autoLogout: true,
+          maxAge    : 60 * 60 * 24 * 7
         },
         user     : {
           property : 'user',

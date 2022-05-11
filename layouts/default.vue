@@ -38,7 +38,7 @@
           </nuxt-link>
         </v-col>
         <v-divider></v-divider>
-        <v-list-item class="" v-if="$auth.loggedIn" two-line>
+        <v-list-item class="my-1" v-if="$auth.loggedIn" two-line>
           <v-list-item-avatar>
             <ContactAvatar :avatar="$auth.user.avatar"
                            :name="$auth.user.firstName"
@@ -53,7 +53,7 @@
 
       <v-divider></v-divider>
 
-      <v-list dense>
+      <v-list>
         <!--   Dashboard     -->
         <v-list-item v-for="item in menuItems"
                      v-if="item.needAuth === $auth.loggedIn"
@@ -70,10 +70,12 @@
     </v-navigation-drawer>
 
     <!--  Toolbar  -->
-    <v-app-bar height="60px" rounded absolute app>
+    <v-app-bar height="65px" rounded absolute app>
       <!--   Menu Icon   -->
-      <v-btn @click="drawerMenu = true" icon>
-        <v-icon>mdi-menu</v-icon>
+      <v-btn @click="drawerMenu = true"
+             :class="directionOfLanguage === 'rtl' ? 'mr-1 ml-2' : 'ml-1 mr-2'"
+             icon>
+        <v-icon size="27">mdi-menu</v-icon>
       </v-btn>
 
       <!--   Logo   -->

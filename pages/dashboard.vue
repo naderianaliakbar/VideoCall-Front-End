@@ -325,26 +325,18 @@ export default {
   methods : {
     async editProfile() {
       this.editProfileLoading = true;
-      let result              = this.$axios.put('users/me', this.editForm).then(async response => {
-        this.editProfileLoading = false;
+      this.$axios.put('users/me', this.editForm).then(async response => {
         this.$notifier.showMessage({
           content: this.$t(`EDIT_SUCCESSFUL`),
           color  : 'success'
         });
         await this.$auth.fetchUser();
       }).catch(({response}) => {
-        this.editProfileLoading = false;
         if (response.status) {
           switch (response.status) {
             case 406:
               this.$notifier.showMessage({
                 content: this.$t(`EMAIL_EXISTS`),
-                color  : 'error'
-              });
-              break;
-            case 500 || 504:
-              this.$notifier.showMessage({
-                content: this.$t(`REQUEST_FAILED`),
                 color  : 'error'
               });
               break;
@@ -355,6 +347,8 @@ export default {
             color  : 'error'
           });
         }
+      }).finally(() => {
+        this.editProfileLoading = false;
       });
     },
     setColor(color) {

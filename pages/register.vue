@@ -118,7 +118,7 @@ export default {
   methods: {
     async submit() {
       this.loading = true;
-      let result   = this.$axios.post('auth/register', {
+      this.$axios.post('auth/register', {
         firstName: this.firstName,
         lastName : this.lastName,
         email    : this.email,
@@ -129,24 +129,16 @@ export default {
           content: this.$t(`REGISTER_SUCCESSFUL`),
           color  : 'success'
         });
-        this.loading = false;
         // redirect user
         await this.$router.push({
           path: "/dashboard"
         });
       }).catch(({response}) => {
-        this.loading = false;
         if (response.status) {
           switch (response.status) {
             case 406:
               this.$notifier.showMessage({
                 content: this.$t(`EMAIL_EXISTS`),
-                color  : 'error'
-              });
-              break;
-            case 500 || 504:
-              this.$notifier.showMessage({
-                content: this.$t(`REQUEST_FAILED`),
                 color  : 'error'
               });
               break;
@@ -157,6 +149,8 @@ export default {
             color  : 'error'
           });
         }
+      }).finally(() => {
+        this.loading = false;
       });
     }
   }

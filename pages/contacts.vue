@@ -93,16 +93,13 @@ export default {
   },
   data      : () => {
     return {
-      contactsLoading  : false,
+      contactsLoading  : true,
       addContactLoading: false,
       addContactDialog : false,
       addContactForm   : {
         email: ''
       },
-      list             : [
-        {firstName: 'AliAkbar', lastName: 'Naderian', email: 'naderianaliakbar@gmail.com'},
-        {firstName: 'Mehdi', lastName: 'Asefi', email: 'mehdiasefi1381@gmail.com'},
-      ]
+      list             : []
     };
   },
   computed  : {
@@ -112,8 +109,51 @@ export default {
   },
   methods   : {
     async addContact() {
-
+      this.addContactLoading = true;
+      this.$axios.post('users/contacts', {
+        email: this.addContactForm.email,
+      }).then(async response => {
+        this.$notifier.showMessage({
+          content: this.$t(`CONTACT_ADDED`),
+          color  : 'success'
+        });
+      }).catch(({response}) => {
+        if (response.status) {
+          switch (response.status) {
+            case 406:
+              this.$notifier.showMessage({
+                content: this.$t(`CONTACT_NOT_FOUND`),
+                color  : 'error'
+              });
+              break;
+            case 400:
+              this.$notifier.showMessage({
+                content: this.$t(`CONTACT_ALREADY_EXISTS`),
+                color  : 'error'
+              });
+              break;
+          }
+        } else {
+          this.$notifier.showMessage({
+            content: this.$t(`REQUEST_FAILED`),
+            color  : 'error'
+          });
+        }
+      }).finally(() => {
+        this.addContactLoading = false;
+      });
+    },
+    async getContacts() {
+      this.contactsLoading = true;
+      this.$axios.get('users/contacts').then(async response => {
+        this.list            = response.data.contacts;
+        this.contactsLoading = false;
+        console.log(this.list);
+      });
     }
+  },
+  mounted() {
+    this.getContacts();
   }
 }
 </script>
