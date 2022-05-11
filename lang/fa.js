@@ -51,7 +51,9 @@ let messages = {
   CONTACT_NOT_FOUND     : 'هیچ کاربری با این ایمیل یافت نشد',
   CONTACT_ALREADY_EXISTS: 'این مخاطب از قبل وجود دارد',
   CONTACT_ADDED         : 'مخاظب اضافه شد',
-  NO_CONTACT            : 'مخاطبی پیدا نشد'
+  CONTACT_DELETED       : 'مخاظب حذف شد',
+  NO_CONTACT            : 'مخاطبی پیدا نشد',
+  DELETE                : 'حذف'
 };
 
 export default messages;

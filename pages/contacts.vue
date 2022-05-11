@@ -109,9 +109,14 @@
     <!--  Desktop List  -->
     <div class="d-none d-md-inline" v-if="!contactsLoading">
       <v-row class="mt-6" justify="center">
-        <v-col cols="2" v-for="contact in list">
-          <v-card class="px-0 py-6" outlined>
-            <div class="d-flex justify-center">
+        <v-col cols="2"
+               v-for="contact in list"
+               @contextmenu="showContextMenu($event,contact._id)">
+          <v-card class="px-0"
+                  :disabled="contextMenu.loading && contextMenu.id === contact._id"
+                  :loading="contextMenu.loading && contextMenu.id === contact._id"
+                  outlined>
+            <div class="d-flex justify-center mt-6">
               <ContactAvatar :avatar="contact.avatar"
                              :name="contact.firstName"
                              :color="contact.color" :size="110"/>
@@ -119,7 +124,7 @@
             <div class="d-flex justify-center">
               <label class="mt-4 font-weight-bold">{{ contact.firstName + ' ' + contact.lastName }}</label>
             </div>
-            <div class="d-flex justify-center  mt-2">
+            <div class="d-flex justify-center mb-3  mt-2">
               <v-btn class="mx-2" icon>
                 <v-icon>mdi-phone-outline</v-icon>
               </v-btn>
@@ -132,6 +137,20 @@
       </v-row>
     </div>
 
+    <!--  Contact context menu  -->
+    <v-menu v-model="contextMenu.show"
+            :position-x="contextMenu.x"
+            :position-y="contextMenu.y"
+            transition="slide-x-transition"
+            absolute
+            offset-y>
+      <v-list dense>
+        <v-list-item @click="deleteContact" link>
+          <v-list-item-title>{{ $t(`DELETE`) }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
     <!--  Mobile  List Skeleton  -->
     <v-skeleton-loader v-if="contactsLoading"
                        v-for="index in 6"
@@ -140,10 +159,12 @@
                        type="list-item-avatar-two-line">
     </v-skeleton-loader>
 
-
     <!--  Mobile  List   -->
     <v-list v-if="!contactsLoading" class="mt-3 mx-n3 d-block d-md-none" nav>
-      <v-list-item v-for="contact in list" :key="contact.email">
+      <v-list-item v-for="contact in list"
+                   :key="contact.email"
+                   :disabled="contextMenu.loading && contextMenu.id === contact._id"
+                   @contextmenu="showContextMenu($event,contact._id)">
         <v-list-item-avatar>
           <ContactAvatar :avatar="contact.avatar"
                          :name="contact.firstName"
@@ -163,7 +184,7 @@
       </v-list-item>
     </v-list>
 
-    <row v-if="!contactsLoading && !list.length">
+    <div v-if="!contactsLoading && !list.length">
       <v-row class="d-flex justify-center">
         <h2 class="mt-16">{{ $t(`NO_CONTACT`) }}</h2>
       </v-row>
@@ -173,7 +194,7 @@
           {{ $t(`ADD_CONTACT`) }}
         </v-btn>
       </v-row>
-    </row>
+    </div>
 
 
   </v-sheet>
@@ -199,6 +220,13 @@ export default {
         email: ''
       },
       list             : [],
+      contextMenu      : {
+        show   : false,
+        loading: false,
+        x      : 0,
+        y      : 0,
+        id     : ''
+      }
     }
   },
   computed  : {
@@ -209,7 +237,7 @@ export default {
   methods   : {
     async addContact() {
       this.addContactLoading = true;
-      this.$axios.post('users/contacts', {
+      this.$axios.post('contacts', {
         email: this.addContactForm.email,
       }).then(async response => {
         this.$notifier.showMessage({
@@ -246,11 +274,52 @@ export default {
     },
     async getContacts() {
       this.contactsLoading = true;
-      this.$axios.get('users/contacts').then(async response => {
+      this.$axios.get('contacts').then(async response => {
         this.list            = response.data.contacts;
         this.contactsLoading = false;
       });
+    },
+    async deleteContact() {
+      this.contextMenu.loading = true;
+      this.$axios.delete('contacts/' + this.contextMenu.id).then(async response => {
+        this.$notifier.showMessage({
+          content: this.$t(`CONTACT_DELETED`),
+          color  : 'success'
+        });
+        await this.getContacts();
+      }).catch(({response}) => {
+        if (response.status) {
+          switch (response.status) {
+            case 406:
+              this.$notifier.showMessage({
+                content: this.$t(`CONTACT_NOT_FOUND`),
+                color  : 'error'
+              });
+              break;
+          }
+        } else {
+          this.$notifier.showMessage({
+            content: this.$t(`REQUEST_FAILED`),
+            color  : 'error'
+          });
+        }
+      }).finally(() => {
+        this.contextMenu.loading = false;
+      });
+    },
+    showContextMenu(e, id) {
+      e.preventDefault();
+      if (!this.contextMenu.loading) {
+        this.contextMenu.show = false;
+        this.contextMenu.x    = e.clientX;
+        this.contextMenu.y    = e.clientY;
+        this.contextMenu.id   = id;
+        this.$nextTick(() => {
+          this.contextMenu.show = true;
+        });
+      }
     }
+    ,
   },
   mounted() {
     this.getContacts();

@@ -52,7 +52,9 @@ let messages = {
   CONTACT_NOT_FOUND     : 'No users found with this email',
   CONTACT_ALREADY_EXISTS: 'The contact already exists',
   CONTACT_ADDED         : 'Contact added',
+  CONTACT_DELETED       : 'Contact deleted',
   NO_CONTACT            : 'No contacts found',
+  DELETE                : 'Delete',
 };
 
 export default messages;
