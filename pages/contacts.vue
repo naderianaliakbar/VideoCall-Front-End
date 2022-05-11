@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="pa-3 pa-md-5 rounded-lg" min-height="50vh">
+  <v-sheet class="pa-5 rounded-lg" min-height="81vh">
     <h1>
       {{ $t(`CONTACTS`) }}
       <!--    Button Add a contact    -->
@@ -77,8 +77,72 @@
       </v-card>
     </v-dialog>
 
-    <!--   List   -->
-    <v-list class="mt-3" nav>
+    <!--  Desktop List Skeleton  -->
+    <div class="d-none d-md-inline" v-if="contactsLoading">
+      <v-row class="mt-6" justify="center">
+        <v-col cols="2" v-for="index in 12">
+          <v-card class="px-0 py-10" outlined>
+            <div class="d-flex justify-center">
+              <v-skeleton-loader class="mt-1" type="avatar" transition="scale-transition"></v-skeleton-loader>
+            </div>
+            <div class="d-flex justify-center mt-n3">
+              <v-skeleton-loader width="30"
+                                 height="30"
+                                 class="mt-5"
+                                 type="avatar"
+                                 style="border-top-left-radius: 25px"
+                                 tile>
+              </v-skeleton-loader>
+              <v-skeleton-loader width="30"
+                                 height="30"
+                                 class="mt-5"
+                                 type="avatar"
+                                 style="border-top-right-radius: 25px"
+                                 tile>
+              </v-skeleton-loader>
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </div>
+
+    <!--  Desktop List  -->
+    <div class="d-none d-md-inline" v-if="!contactsLoading">
+      <v-row class="mt-6" justify="center">
+        <v-col cols="2" v-for="contact in list">
+          <v-card class="px-0 py-6" outlined>
+            <div class="d-flex justify-center">
+              <ContactAvatar :avatar="contact.avatar"
+                             :name="contact.firstName"
+                             :color="contact.color" :size="110"/>
+            </div>
+            <div class="d-flex justify-center">
+              <label class="mt-4 font-weight-bold">{{ contact.firstName + ' ' + contact.lastName }}</label>
+            </div>
+            <div class="d-flex justify-center  mt-2">
+              <v-btn class="mx-2" icon>
+                <v-icon>mdi-phone-outline</v-icon>
+              </v-btn>
+              <v-btn icon>
+                <v-icon>mdi-video-outline</v-icon>
+              </v-btn>
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </div>
+
+    <!--  Mobile  List Skeleton  -->
+    <v-skeleton-loader v-if="contactsLoading"
+                       v-for="index in 6"
+                       :key="index"
+                       class="mt-3 mx-n3 d-block d-md-none"
+                       type="list-item-avatar-two-line">
+    </v-skeleton-loader>
+
+
+    <!--  Mobile  List   -->
+    <v-list v-if="!contactsLoading" class="mt-3 mx-n3 d-block d-md-none" nav>
       <v-list-item v-for="contact in list" :key="contact.email">
         <v-list-item-avatar>
           <ContactAvatar :avatar="contact.avatar"
@@ -89,29 +153,27 @@
           <v-list-item-title>{{ contact.firstName + ' ' + contact.lastName }}</v-list-item-title>
         </v-list-item-content>
         <v-list-item-icon>
-          <v-btn  class="mx-2" large icon>
+          <v-btn class="mx-2" icon>
             <v-icon>mdi-phone-outline</v-icon>
           </v-btn>
-          <v-btn large icon>
+          <v-btn icon>
             <v-icon>mdi-video-outline</v-icon>
           </v-btn>
         </v-list-item-icon>
       </v-list-item>
     </v-list>
 
-    <row v-if="!list.length">
+    <row v-if="!contactsLoading && !list.length">
       <v-row class="d-flex justify-center">
-        <h2 class="d-block">{{ $t(`NO_CONTACT`) }}</h2>
+        <h2 class="mt-16">{{ $t(`NO_CONTACT`) }}</h2>
       </v-row>
 
       <v-row class="d-flex justify-center my-7">
-        <v-btn color="primary">
+        <v-btn color="primary" @click="addContactDialog = true">
           {{ $t(`ADD_CONTACT`) }}
         </v-btn>
       </v-row>
     </row>
-
-
 
 
   </v-sheet>

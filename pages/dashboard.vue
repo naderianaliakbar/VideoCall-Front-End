@@ -210,6 +210,7 @@
         </v-alert>
       </v-col>
     </v-row>
+
     <!--   Statistics cards   -->
     <v-row class="mt-2" v-if="!statisticsLoading">
       <!--    All Calls      -->
