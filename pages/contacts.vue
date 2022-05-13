@@ -125,10 +125,15 @@
               <label class="mt-4 font-weight-bold">{{ contact.firstName + ' ' + contact.lastName }}</label>
             </div>
             <div class="d-flex justify-center mb-3  mt-2">
-              <v-btn class="mx-2" icon>
+              <v-btn @click="createCall(0,contact._id)"
+                     class="mx-2"
+                     :loading="createCallForm.id === contact._id && createCallForm.type === 0"
+                     icon>
                 <v-icon>mdi-phone-outline</v-icon>
               </v-btn>
-              <v-btn icon>
+              <v-btn @click="createCall(1,contact._id)"
+                     :loading="createCallForm.id === contact._id && createCallForm.type === 0"
+                     icon>
                 <v-icon>mdi-video-outline</v-icon>
               </v-btn>
             </div>
@@ -184,6 +189,7 @@
       </v-list-item>
     </v-list>
 
+    <!--  No Contact  -->
     <div v-if="!contactsLoading && !list.length">
       <v-row class="d-flex justify-center">
         <h2 class="mt-16">{{ $t(`NO_CONTACT`) }}</h2>
@@ -219,6 +225,11 @@ export default {
       addContactForm   : {
         email: ''
       },
+      createCallForm   : {
+        id     : '',
+        type   : 0,
+        loading: false
+      },
       list             : [],
       contextMenu      : {
         show   : false,
@@ -245,7 +256,8 @@ export default {
           color  : 'success'
         });
         await this.getContacts();
-        this.addContactDialog = false;
+        this.addContactForm.email = '';
+        this.addContactDialog     = false;
       }).catch(({response}) => {
         if (response.status) {
           switch (response.status) {
@@ -307,6 +319,41 @@ export default {
         this.contextMenu.loading = false;
       });
     },
+    async createCall(type, id) {
+      this.createCallForm.loading = true;
+      this.createCallForm.id      = id;
+      this.createCallForm.type    = type;
+      await this.$axios.post('calls', {
+        contactId: this.createCallForm.id,
+        callType : type
+      }).then(async response => {
+        // set room id
+        this.$store.commit('user/setUserRoom', response.data.callId);
+
+        // redirect to call page
+        this.$router.push({
+          path: "/call"
+        });
+      }).catch(({response}) => {
+        if (response.status) {
+          switch (response.status) {
+            case 400:
+              this.$notifier.showMessage({
+                content: this.$t(`NOT_FOUND`),
+                color  : 'error'
+              });
+              break;
+          }
+        } else {
+          this.$notifier.showMessage({
+            content: this.$t(`REQUEST_FAILED`),
+            color  : 'error'
+          });
+        }
+      }).finally(() => {
+        this.createCallForm.loading = false;
+      });
+    },
     showContextMenu(e, id) {
       e.preventDefault();
       if (!this.contextMenu.loading) {
@@ -318,8 +365,7 @@ export default {
           this.contextMenu.show = true;
         });
       }
-    }
-    ,
+    },
   },
   mounted() {
     this.getContacts();

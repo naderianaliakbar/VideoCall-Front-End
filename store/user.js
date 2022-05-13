@@ -4,6 +4,7 @@ export const state = () => ({
   lastName : '',
   language : 'fa',
   color    : '',
+  roomId   : ''
 })
 
 export const mutations = {
@@ -17,5 +18,8 @@ export const mutations = {
   },
   setUserColor(state, color) {
     state.color = color;
+  },
+  setUserRoom(state, roomId) {
+    state.roomId = roomId;
   }
 }
