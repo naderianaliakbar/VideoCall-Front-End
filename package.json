@@ -16,6 +16,7 @@
     "core-js": "^3.19.3",
     "mime": "^3.0.0",
     "nuxt": "^2.13.3",
+    "socket.io-client": "^4.5.0",
     "validate-color": "^2.2.1",
     "vee-validate": "3",
     "vue": "^2.6.14",

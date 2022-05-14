@@ -90,14 +90,14 @@
                                  height="30"
                                  class="mt-5"
                                  type="avatar"
-                                 style="border-top-left-radius: 25px"
+                                 style="border-top-left-radius: 25px;"
                                  tile>
               </v-skeleton-loader>
               <v-skeleton-loader width="30"
                                  height="30"
                                  class="mt-5"
                                  type="avatar"
-                                 style="border-top-right-radius: 25px"
+                                 style="border-top-right-radius: 25px;"
                                  tile>
               </v-skeleton-loader>
             </div>
@@ -128,11 +128,13 @@
               <v-btn @click="createCall(0,contact._id)"
                      class="mx-2"
                      :loading="createCallForm.id === contact._id && createCallForm.type === 0"
+                     :disabled="createCallForm.loading"
                      icon>
                 <v-icon>mdi-phone-outline</v-icon>
               </v-btn>
               <v-btn @click="createCall(1,contact._id)"
-                     :loading="createCallForm.id === contact._id && createCallForm.type === 0"
+                     :loading="createCallForm.id === contact._id && createCallForm.type === 1"
+                     :disabled="createCallForm.loading"
                      icon>
                 <v-icon>mdi-video-outline</v-icon>
               </v-btn>
@@ -179,10 +181,15 @@
           <v-list-item-title>{{ contact.firstName + ' ' + contact.lastName }}</v-list-item-title>
         </v-list-item-content>
         <v-list-item-icon>
-          <v-btn class="mx-2" icon>
+          <v-btn class="mx-2"
+                 :loading="createCallForm.id === contact._id && createCallForm.type === 0"
+                 :disabled="createCallForm.loading"
+                 icon>
             <v-icon>mdi-phone-outline</v-icon>
           </v-btn>
-          <v-btn icon>
+          <v-btn :loading="createCallForm.id === contact._id && createCallForm.type === 1"
+                 :disabled="createCallForm.loading"
+                 icon>
             <v-icon>mdi-video-outline</v-icon>
           </v-btn>
         </v-list-item-icon>
@@ -201,7 +208,6 @@
         </v-btn>
       </v-row>
     </div>
-
 
   </v-sheet>
 </template>

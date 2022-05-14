@@ -29,6 +29,7 @@ export default {
     '~/plugins/vee-validate.js',
     '~/plugins/notifier.js',
     '~/plugins/global.js',
+    '~/plugins/websocket.js',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

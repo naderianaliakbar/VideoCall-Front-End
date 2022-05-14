@@ -147,6 +147,17 @@ export default {
   watch   : {
     page(val) {
       this.$nuxt.$i18n.setLocale(this.$store.state.user.language);
+    },
+    loggedIn(val) {
+      // check for create socket
+      if (val) {
+        this.$websocket.createConnection();
+      } else {
+        // check if is connected destroy connection
+        if (this.$websocket.getSocket() !== undefined) {
+          this.$websocket.destroyConnection();
+        }
+      }
     }
   },
   computed: {
@@ -164,6 +175,9 @@ export default {
     },
     directionOfLanguage() {
       return this.$nuxt.$i18n.localeProperties.dir;
+    },
+    loggedIn() {
+      return this.$auth.loggedIn;
     }
   },
   mounted() {
