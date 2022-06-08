@@ -20,6 +20,16 @@
       </div>
     </v-overlay>
 
+    <!-- socket Connect Overlay  -->
+    <v-overlay :value="socketConnectError" opacity="1">
+      <div>
+        <v-row class="d-flex justify-center my-3">
+          <v-icon class="d-block" color="red" size="100">mdi-connection</v-icon>
+        </v-row>
+        <h3>{{ $t(`USER_CONNECT_ERROR`) }}</h3>
+      </div>
+    </v-overlay>
+
     <!--  Navigation drawer  -->
     <v-navigation-drawer
       :right="$nuxt.$i18n.localeProperties.dir === 'rtl'"
@@ -178,6 +188,9 @@ export default {
     },
     loggedIn() {
       return this.$auth.loggedIn;
+    },
+    socketConnectError() {
+      return this.$store.state.system.socketConnectError;
     }
   },
   mounted() {
@@ -192,6 +205,16 @@ export default {
     window.addEventListener("online", (event) => {
       this.connected = true;
     });
+
+    // check for create socket
+    if (this.loggedIn) {
+      this.$websocket.createConnection();
+    } else {
+      // check if is connected destroy connection
+      if (this.$websocket.getSocket() !== undefined) {
+        this.$websocket.destroyConnection();
+      }
+    }
 
   },
   created() {

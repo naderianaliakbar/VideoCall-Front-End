@@ -53,7 +53,8 @@ let messages = {
   CONTACT_ADDED         : 'مخاظب اضافه شد',
   CONTACT_DELETED       : 'مخاظب حذف شد',
   NO_CONTACT            : 'مخاطبی پیدا نشد',
-  DELETE                : 'حذف'
+  DELETE                : 'حذف',
+  USER_CONNECT_ERROR    : 'شما قبلا یک بار اپ را باز کردید.  لطفا به همان صفحه برگردید'
 };
 
 export default messages;

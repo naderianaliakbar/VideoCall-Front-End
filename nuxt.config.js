@@ -144,6 +144,10 @@ export default {
     SITE_URL: process.env.SITE_URL
   },
 
+  publicRuntimeConfig: {
+    SOCKET_URL: process.env.SOCKET_URL
+  },
+
   server: {
     host: '0.0.0.0',
     port: 3000

@@ -55,6 +55,7 @@ let messages = {
   CONTACT_DELETED       : 'Contact deleted',
   NO_CONTACT            : 'No contacts found',
   DELETE                : 'Delete',
+  USER_CONNECT_ERROR    : 'You have already opened the app once. Please return to the same page'
 };
 
 export default messages;
