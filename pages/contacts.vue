@@ -182,12 +182,14 @@
         </v-list-item-content>
         <v-list-item-icon>
           <v-btn class="mx-2"
+                 @click="createCall(0,contact._id)"
                  :loading="createCallForm.id === contact._id && createCallForm.type === 0"
                  :disabled="createCallForm.loading"
                  icon>
             <v-icon>mdi-phone-outline</v-icon>
           </v-btn>
-          <v-btn :loading="createCallForm.id === contact._id && createCallForm.type === 1"
+          <v-btn @click="createCall(1,contact._id)"
+                 :loading="createCallForm.id === contact._id && createCallForm.type === 1"
                  :disabled="createCallForm.loading"
                  icon>
             <v-icon>mdi-video-outline</v-icon>

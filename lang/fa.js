@@ -54,7 +54,10 @@ let messages = {
   CONTACT_DELETED       : 'مخاظب حذف شد',
   NO_CONTACT            : 'مخاطبی پیدا نشد',
   DELETE                : 'حذف',
-  USER_CONNECT_ERROR    : 'شما قبلا یک بار اپ را باز کردید.  لطفا به همان صفحه برگردید'
+  USER_CONNECT_ERROR    : 'شما قبلا یک بار اپ را باز کردید.  لطفا به همان صفحه برگردید',
+  PERMISSION_DENIED     : 'شما به این قسمت دسترسی ندارید',
+  LOADING               : 'در حال بارگزاری',
+  PREPARING_CALL        : 'در حال آماده سازی تماس',
 };
 
 export default messages;
