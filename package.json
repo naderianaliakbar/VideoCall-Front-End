@@ -14,6 +14,7 @@
     "@nuxtjs/axios": "latest",
     "@nuxtjs/i18n": "^7.2.2",
     "core-js": "^3.19.3",
+    "detectrtc": "^1.4.1",
     "mime": "^3.0.0",
     "nuxt": "^2.13.3",
     "socket.io-client": "^4.5.0",

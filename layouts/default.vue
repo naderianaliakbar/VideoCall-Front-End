@@ -34,10 +34,10 @@
       </v-row>
       <!--   Action Buttons   -->
       <v-row class="d-flex justify-center my-5">
-        <v-btn class="red mx-10" width="70" height="70" icon>
+        <v-btn class="red mx-10" width="70" height="70" @click="rejectCall" icon>
           <v-icon>mdi-phone-hangup-outline</v-icon>
         </v-btn>
-        <v-btn class="green mx-10" width="70" height="70" icon>
+        <v-btn class="green mx-10" width="70" height="70" @click="acceptCall" icon>
           <v-icon>mdi-phone-outline</v-icon>
         </v-btn>
       </v-row>
@@ -272,10 +272,22 @@ export default {
         this.getCallInfo();
       });
       this.socket.on('endCall', (roomId) => {
-        if(this.callInfo._id === roomId) {
+        if (this.callInfo._id === roomId) {
           this.callNotify = false;
         }
       });
+    },
+    acceptCall() {
+      // set room id
+      this.$store.commit('user/setUserRoom', this.callInfo._id);
+
+      // redirect to call page
+      this.$router.push({
+        path: "/call"
+      });
+    },
+    rejectCall() {
+      this.socket.emit('rejectCall', this.callInfo._id, this.callInfo.user._id);
     },
     getCallInfo() {
       this.$axios.get('calls/' + this.callInfo._id).then(response => {
