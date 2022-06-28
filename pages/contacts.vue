@@ -169,7 +169,7 @@
     <!--  Mobile  List   -->
     <v-list v-if="!contactsLoading" class="mt-3 mx-n3 d-block d-md-none" nav>
       <v-list-item v-for="contact in list"
-                   :key="contact.email"
+                   :key="contact._id"
                    :disabled="contextMenu.loading && contextMenu.id === contact._id"
                    @contextmenu="showContextMenu($event,contact._id)">
         <v-list-item-avatar>

@@ -20,6 +20,29 @@
       </div>
     </v-overlay>
 
+    <!-- Call Notifier  -->
+    <v-overlay :value="(callNotify && callInfo.user.length)" opacity="1">
+      <!--   Avatar   -->
+      <v-row class="d-flex justify-center my-3">
+        <ContactAvatar :avatar="callInfo.user.avatar"
+                       :name="callInfo.user.firstName"
+                       :color="callInfo.user.color" :size="180"/>
+      </v-row>
+      <!--   Name   -->
+      <v-row class="d-flex justify-center my-3">
+        <p class="mt-12 text-h4">{{ callInfo.user.firstName + ' ' + callInfo.user.lastName }}</p>
+      </v-row>
+      <!--   Action Buttons   -->
+      <v-row class="d-flex justify-center my-5">
+        <v-btn class="red mx-10" width="70" height="70" icon>
+          <v-icon>mdi-phone-hangup-outline</v-icon>
+        </v-btn>
+        <v-btn class="green mx-10" width="70" height="70" icon>
+          <v-icon>mdi-phone-outline</v-icon>
+        </v-btn>
+      </v-row>
+    </v-overlay>
+
     <!-- socket Connect Overlay  -->
     <v-overlay :value="socketConnectError" opacity="1">
       <div>
@@ -152,6 +175,12 @@ export default {
       userMenu  : false,
       drawerMenu: false,
       connected : true,
+      callNotify: true,
+      socket    : '',
+      callInfo  : {
+        _id : '',
+        user: []
+      }
     }
   },
   watch   : {
@@ -162,6 +191,7 @@ export default {
       // check for create socket
       if (val) {
         this.$websocket.createConnection();
+        this.setActiveReceiveCalls();
       } else {
         // check if is connected destroy connection
         if (this.$websocket.getSocket() !== undefined) {
@@ -209,6 +239,7 @@ export default {
     // check for create socket
     if (this.loggedIn) {
       this.$websocket.createConnection();
+      this.setActiveReceiveCalls();
     } else {
       // check if is connected destroy connection
       if (this.$websocket.getSocket() !== undefined) {
@@ -233,6 +264,41 @@ export default {
       this.$store.commit('user/changeLanguage', lange);
       this.setLayoutLanguage();
     },
+    setActiveReceiveCalls() {
+      // set socket object
+      this.socket = this.$websocket.getSocket();
+      this.socket.on('notifyCall', (roomId) => {
+        this.callInfo._id = roomId;
+        this.getCallInfo();
+      });
+      this.socket.on('endCall', (roomId) => {
+        if(this.callInfo._id === roomId) {
+          this.callNotify = false;
+        }
+      });
+    },
+    getCallInfo() {
+      this.$axios.get('calls/' + this.callInfo._id).then(response => {
+        this.callInfo   = response.data;
+        this.callNotify = true;
+      }).catch(({response}) => {
+        if (response.status) {
+          switch (response.status) {
+            case 403:
+              this.$notifier.showMessage({
+                content: this.$t(`PERMISSION_DENIED`),
+                color  : 'error'
+              });
+              break;
+          }
+        } else {
+          this.$notifier.showMessage({
+            content: this.$t(`REQUEST_FAILED`),
+            color  : 'error'
+          });
+        }
+      });
+    }
   }
 }
 </script>

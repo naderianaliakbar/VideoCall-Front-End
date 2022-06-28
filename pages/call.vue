@@ -3,37 +3,37 @@
     <!--  loading overlay  -->
     <v-overlay :value="loading" opacity="1">
       <v-row no-gutters>
-        <h2>{{ loadingText }}</h2>
+        <h1>{{ loadingText }}</h1>
       </v-row>
       <v-row class="d-flex justify-center mt-5" no-gutters>
         <v-progress-circular indeterminate></v-progress-circular>
       </v-row>
     </v-overlay>
 
-    <!--   Call Page     -->
-    <!--    <div class="gridVideos pt-0 pl-3 pr-3" v-if="userOnCall">-->
-    <!--      <v-row>-->
-    <!--        <v-col class="mainStream pa-0 pt-3" cols="12" sm="12" md="9" lg="9" xl="9">-->
-    <!--          <Stream v-if="renderStreams"-->
-    <!--                        :isMainStream="true"-->
-    <!--                        :srcObject="getStream(mainStream)"-->
-    <!--                        :streamName="getStreamName(getStream(mainStream))"/>-->
-    <!--        </v-col>-->
-    <!--        <v-col class="listOfStreams pr-0 pl-2 pb-0 pt-4" cols="12" sm="12" md="3" lg="3" xl="3">-->
-    <!--          <v-list subheader>-->
-    <!--            <v-list-item v-for="(stream,index) in streams"-->
-    <!--                         :key="index"-->
-    <!--                         class="streamItem pr-0 pl-0 pt-1 pb-1"-->
-    <!--                         v-if="stream != null && renderStreams">-->
-    <!--              <Stream @selectAsMainStream="selectAsMainStream"-->
-    <!--                            :isMainStream="false"-->
-    <!--                            :srcObject="getStream(stream.name)"-->
-    <!--                            :streamName="getStreamName(stream)"/>-->
-    <!--            </v-list-item>-->
-    <!--          </v-list>-->
-    <!--        </v-col>-->
-    <!--      </v-row>-->
-    <!--    </div>-->
+    <!--    Call Page    -->
+    <div class="gridVideos pt-0 pl-3 pr-3" v-if="!loading">
+      <v-row>
+        <v-col class="mainStream pa-0 pt-3" cols="12" sm="12" md="9" lg="9" xl="9">
+          <Stream v-if="renderStreams"
+                  :isMainStream="true"
+                  :srcObject="getStream(mainStream)"
+                  :streamName="getStreamName(getStream(mainStream))"/>
+        </v-col>
+        <v-col class="listOfStreams pr-0 pl-2 pb-0 pt-4" cols="12" sm="12" md="3" lg="3" xl="3">
+          <v-list subheader>
+            <v-list-item v-for="(stream,index) in streams"
+                         :key="index"
+                         class="streamItem pr-0 pl-0 pt-1 pb-1"
+                         v-if="stream != null && renderStreams">
+              <Stream @selectAsMainStream="selectAsMainStream"
+                      :isMainStream="false"
+                      :srcObject="getStream(stream.name)"
+                      :streamName="getStreamName(stream)"/>
+            </v-list-item>
+          </v-list>
+        </v-col>
+      </v-row>
+    </div>
 
 
   </v-sheet>
@@ -45,34 +45,34 @@ export default {
   auth    : true,
   data    : () => {
     return {
-      status           : -1,
-      loading          : true,
-      loadingText      : '',
-      roomInfo         : {},
-      socket           : '',
-      creator          : false,
-      peerUser         : '',
-      myPeerId         : '',
-      connection       : null,
-      microphone       : false,
-      microphoneLoader : false,
-      microphoneAccess : '',
-      camera           : false,
-      cameraLoader     : false,
-      cameraAccess     : '',
-      screenShare      : false,
-      screenShareLoader: false,
-      userMediaAccess  : '',
-      userBrowser      : undefined,
-      deviceWidth      : 0,
-      deviceHeight     : 0,
-      mainStream       : 'local',
-      streams          : {
+      status              : -1,
+      loading             : true,
+      loadingText         : '',
+      roomInfo            : {},
+      socket              : '',
+      creator             : false,
+      peerUser            : '',
+      myPeerId            : '',
+      connection          : null,
+      microphone          : false,
+      microphoneLoader    : false,
+      microphoneAccess    : '',
+      camera              : false,
+      cameraLoader        : false,
+      cameraAccess        : '',
+      screenShare         : false,
+      screenShareLoader   : false,
+      userMediaAccess     : '',
+      userBrowser         : undefined,
+      deviceWidth         : 0,
+      deviceHeight        : 0,
+      mainStream          : 'local',
+      streams             : {
         localUserMediaStream  : null,
         localScreenShareStream: null,
         remoteUserMediaStream : null,
       },
-      streamsTracks    : {
+      streamsTracks       : {
         localTracks: {
           userMediaTracks  : {
             microphone: null,
@@ -84,7 +84,17 @@ export default {
           },
         },
       },
-      renderStreams    : false,
+      renderStreams       : false,
+      peerConnectionConfig: {
+        iceTransportPolicy: 'relay',
+        iceServers        : [
+          {
+            urls      : 'turn:turn.exoroya.ir',
+            credential: '123',
+            username  : 'abc'
+          },
+        ]
+      }
     };
   },
   computed: {
@@ -181,51 +191,38 @@ export default {
       });
     }
 
-
     // create call
-    this.socket.on('callAccepted', (peerId) => {
+    this.socket.on('callAccepted', () => {
       this.loadingText = this.$t(`CONNECTING`);
       this.getUserMediaAccess(() => {
-        var call        = this.$peer.call(peerId, this.streams.localUserMediaStream);
-        this.connection = call.peerConnection;
-        call.on('stream', (remoteStream) => {
-          this.loading                       = false;
-          remoteStream.username              = this.peerUser;
-          remoteStream.name                  = 'remote';
-          this.streams.remoteUserMediaStream = remoteStream;
-          this.mainStream                    = 'remote';
-          this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
-            video: this.camera || this.screenShare,
-            audio: this.microphone || this.screenShare
+        this.createConnection(() => {
+          // Create Offer, setLocalDescription
+          this.connection.createOffer().then((offer) => {
+            this.connection.setLocalDescription(offer);
+            this.socket.emit('offer', this.peerUser, offer);
           });
         });
       });
     });
 
     // receive call
-    this.$peer.on('call', (call) => {
-      this.getUserMediaAccess(() => {
-        call.answer(this.streams.localUserMediaStream);
-        this.connection = call.peerConnection;
-        call.on('stream', (remoteStream) => {
-          this.loading                       = false;
-          remoteStream.username              = this.peerUser;
-          remoteStream.name                  = 'remote';
-          this.streams.remoteUserMediaStream = remoteStream;
-          this.mainStream                    = 'remote';
-          setTimeout(() => {
-            this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
-              video: this.camera || this.screenShare,
-              audio: this.microphone || this.screenShare
+    this.socket.on('offer', (username, offerDescription) => {
+      if (this.peerUser === username) {
+        this.getUserMediaAccess(() => {
+          this.createConnection(() => {
+            // setRemoteDescription and answer the offer
+            this.connection.setRemoteDescription(offerDescription);
+            this.connection.createAnswer().then((answer) => {
+              this.connection.setLocalDescription(answer);
+              this.socket.emit('answer', username, answer);
             });
-          }, 1500);
+          });
         });
-      });
+      }
     });
 
     this.socket.on('callDeclined', () => {
-      this.loadingText     = 'Declined';
-      this.checkCallLoader = false;
+      this.loadingText = 'Declined';
       setTimeout(() => {
         // redirect to contact page
         this.$router.push({
@@ -299,7 +296,6 @@ export default {
         })
       }, 1500);
     });
-
 
   },
   methods: {
@@ -624,6 +620,64 @@ export default {
     selectAsMainStream(streamObject) {
       this.mainStream = streamObject.name;
     },
+    createConnection(callback) {
+
+      // creating peerConnection
+      this.connection = new RTCPeerConnection(this.peerConnectionConfig);
+
+      if (this.streamsTracks.localTracks.userMediaTracks.microphone != null) {
+        // add microphone track to connection
+        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.microphone);
+      }
+      if (this.streamsTracks.localTracks.userMediaTracks.camera != null) {
+        // add camera track to connection
+        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.camera);
+      }
+
+      // add candidate event
+      this.connection.onicecandidate = ({candidate}) => {
+        candidate && this.socket.emit('candidate', this.peerUser, candidate);
+      };
+
+      // get remote stream
+      this.connection.ontrack = (rtcTrack) => {
+        // create remote media stream
+        if (this.streams.remoteUserMediaStream === null) {
+          this.streams.remoteUserMediaStream          = new MediaStream();
+          this.streams.remoteUserMediaStream.name     = 'remote';
+          this.streams.remoteUserMediaStream.username = this.peerUser;
+          this.mainStream                             = 'remote';
+        }
+        // add track
+        this.streams.remoteUserMediaStream.addTrack(rtcTrack.track);
+
+        if (this.loading) {
+          this.loading = false;
+        }
+        this.reRenderStreams();
+      };
+
+      // Receive Answer to establish peer connection
+      this.socket.on('answer', (username, description) => {
+        if (this.peerUser === username) {
+          this.connection.setRemoteDescription(description);
+        }
+      });
+
+      // Receive candidates and add to peer connection
+      this.socket.on('candidate', (username, candidate) => {
+        if (this.peerUser === username) {
+          if (candidate.candidate != null && candidate.sdpMid != null && candidate.sdpMLineIndex != null) {
+            this.connection.addIceCandidate(new RTCIceCandidate(candidate));
+            console.log('ice candidate added');
+          }
+        }
+      });
+
+      if (callback && typeof callback === 'function') {
+        callback();
+      }
+    }
   },
   watch  : {
     userMediaAccess(val, oldval) {
@@ -707,7 +761,7 @@ export default {
           audio: this.microphone || this.screenShare
         });
       }
-    }
+    },
   },
 }
 </script>
