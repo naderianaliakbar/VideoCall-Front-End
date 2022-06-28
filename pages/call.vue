@@ -11,103 +11,29 @@
     </v-overlay>
 
     <!--   Call Page     -->
-    <div class="gridVideos pt-0 pl-3 pr-3" v-if="userOnCall">
-      <v-row>
-        <v-col class="mainStream pa-0 pt-3" cols="12" sm="12" md="9" lg="9" xl="9">
-          <StreamObject v-if="renderStreams"
-                        :isMainStream="true"
-                        :srcObject="getStream(mainStream)"
-                        :streamName="getStreamName(getStream(mainStream))"/>
-        </v-col>
-        <v-col class="listOfStreams pr-0 pl-2 pb-0 pt-4" cols="12" sm="12" md="3" lg="3" xl="3">
-          <v-list subheader>
-            <v-list-item v-for="(stream,index) in streams"
-                         :key="index"
-                         class="streamItem pr-0 pl-0 pt-1 pb-1"
-                         v-if="stream != null && renderStreams">
-              <StreamObject @selectAsMainStream="selectAsMainStream"
-                            :isMainStream="false"
-                            :srcObject="getStream(stream.name)"
-                            :streamName="getStreamName(stream)"/>
-            </v-list-item>
-          </v-list>
-        </v-col>
-      </v-row>
-    </div>
-
-    <!--   Main Page     -->
-    <div class="mainPage pr-3 pb-3" v-if="!userOnCall">
-      <v-row>
-        <v-col cols="12" md="6" lg="6" xl="6">
-          <v-card class="ma-5">
-
-            <v-toolbar dark>
-              <v-toolbar-title>
-                Call
-              </v-toolbar-title>
-            </v-toolbar>
-
-            <v-card-text>
-              <v-list>
-                <v-subheader>Enter a username to call</v-subheader>
-                <v-list-item>
-                  <v-text-field v-model="callUserName"
-                                :disabled="checkCallLoader"
-                                color="black"
-                                label="username"
-                                outlined>
-                  </v-text-field>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn dark :loading="checkCallLoader" @click="startCall">
-                <v-icon left>mdi-phone</v-icon>
-                Call
-              </v-btn>
-            </v-card-actions>
-
-          </v-card>
-        </v-col>
-        <v-col cols="12" md="6" lg="6" xl="6">
-          <v-card class="ma-5">
-
-            <v-toolbar dark>
-              <v-toolbar-title>
-                Your username
-              </v-toolbar-title>
-            </v-toolbar>
-
-            <v-card-text>
-              <v-list>
-                <v-subheader>Copy username and send it to your friend</v-subheader>
-                <v-list-item>
-                  <v-alert
-                    class="mb-7"
-                    border="left"
-                    icon="mdi-account"
-                    width="100%"
-                    outlined>
-                    {{ this.$store.state.userName }}
-                  </v-alert>
-                </v-list-item>
-              </v-list>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn dark @click="copyUserName">
-                <v-icon left>mdi-content-copy</v-icon>
-                Copy
-              </v-btn>
-            </v-card-actions>
-
-          </v-card>
-        </v-col>
-      </v-row>
-    </div>
+    <!--    <div class="gridVideos pt-0 pl-3 pr-3" v-if="userOnCall">-->
+    <!--      <v-row>-->
+    <!--        <v-col class="mainStream pa-0 pt-3" cols="12" sm="12" md="9" lg="9" xl="9">-->
+    <!--          <Stream v-if="renderStreams"-->
+    <!--                        :isMainStream="true"-->
+    <!--                        :srcObject="getStream(mainStream)"-->
+    <!--                        :streamName="getStreamName(getStream(mainStream))"/>-->
+    <!--        </v-col>-->
+    <!--        <v-col class="listOfStreams pr-0 pl-2 pb-0 pt-4" cols="12" sm="12" md="3" lg="3" xl="3">-->
+    <!--          <v-list subheader>-->
+    <!--            <v-list-item v-for="(stream,index) in streams"-->
+    <!--                         :key="index"-->
+    <!--                         class="streamItem pr-0 pl-0 pt-1 pb-1"-->
+    <!--                         v-if="stream != null && renderStreams">-->
+    <!--              <Stream @selectAsMainStream="selectAsMainStream"-->
+    <!--                            :isMainStream="false"-->
+    <!--                            :srcObject="getStream(stream.name)"-->
+    <!--                            :streamName="getStreamName(stream)"/>-->
+    <!--            </v-list-item>-->
+    <!--          </v-list>-->
+    <!--        </v-col>-->
+    <!--      </v-row>-->
+    <!--    </div>-->
 
 
   </v-sheet>
@@ -126,6 +52,7 @@ export default {
       socket           : '',
       creator          : false,
       peerUser         : '',
+      myPeerId         : '',
       connection       : null,
       microphone       : false,
       microphoneLoader : false,
@@ -157,7 +84,7 @@ export default {
           },
         },
       },
-
+      renderStreams    : false,
     };
   },
   computed: {
@@ -228,7 +155,7 @@ export default {
           this.loadingText = this.$t(`PREPARING_CALL`);
         } else {
           // accept call
-          this.socket.emit('acceptCall', this.peerUser, this.roomInfo._id);
+          this.socket.emit('acceptCall', this.peerUser, this.roomInfo._id, this.myPeerId);
         }
 
 
@@ -240,6 +167,9 @@ export default {
                 content: this.$t(`PERMISSION_DENIED`),
                 color  : 'error'
               });
+              this.$router.push({
+                path: "/contacts"
+              })
               break;
           }
         } else {
@@ -253,20 +183,18 @@ export default {
 
 
     // create call
-    socketIO.on('callAccepted', (peerId) => {
-      this.overlayMessage = 'Connecting...';
-      this.userNameOnCall = this.callUserName;
+    this.socket.on('callAccepted', (peerId) => {
+      this.loadingText = this.$t(`CONNECTING`);
       this.getUserMediaAccess(() => {
         var call        = this.$peer.call(peerId, this.streams.localUserMediaStream);
         this.connection = call.peerConnection;
         call.on('stream', (remoteStream) => {
-          this.userOnCall                    = true;
-          this.overlay                       = false;
-          remoteStream.username              = this.userNameOnCall;
+          this.loading                       = false;
+          remoteStream.username              = this.peerUser;
           remoteStream.name                  = 'remote';
           this.streams.remoteUserMediaStream = remoteStream;
           this.mainStream                    = 'remote';
-          socketIO.emit('getRemoteStreamConfigs', this.userNameOnCall, {
+          this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
             video: this.camera || this.screenShare,
             audio: this.microphone || this.screenShare
           });
@@ -276,19 +204,17 @@ export default {
 
     // receive call
     this.$peer.on('call', (call) => {
-      this.userNameOnCall = this.usernameCallMe;
       this.getUserMediaAccess(() => {
         call.answer(this.streams.localUserMediaStream);
         this.connection = call.peerConnection;
         call.on('stream', (remoteStream) => {
-          this.userOnCall                    = true;
-          this.overlay                       = false;
-          remoteStream.username              = this.userNameOnCall;
+          this.loading                       = false;
+          remoteStream.username              = this.peerUser;
           remoteStream.name                  = 'remote';
           this.streams.remoteUserMediaStream = remoteStream;
           this.mainStream                    = 'remote';
           setTimeout(() => {
-            socketIO.emit('getRemoteStreamConfigs', this.userNameOnCall, {
+            this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
               video: this.camera || this.screenShare,
               audio: this.microphone || this.screenShare
             });
@@ -297,47 +223,42 @@ export default {
       });
     });
 
-    socketIO.on('callDeclined', () => {
-      this.overlayMessage  = 'Declined!';
-      this.someOneCallMe   = false;
+    this.socket.on('callDeclined', () => {
+      this.loadingText     = 'Declined';
       this.checkCallLoader = false;
       setTimeout(() => {
-        this.overlay = false;
+        // redirect to contact page
+        this.$router.push({
+          path: "/contacts"
+        })
       }, 3000);
     });
 
-    socketIO.on("disconnect", () => {
-      this.socketConnected = false;
-    });
-
-    socketIO.on('checkCall', (response) => {
+    this.socket.on('prepareCall', (response) => {
       if (response.status === true) {
-        this.overlayMessage = 'Calling ' + this.callUserName + '...';
+        this.loadingText = this.$t(`CALLING`);
       } else {
         if (response.message === 'offline') {
-          this.overlayMessage = 'the user is offline';
+          this.loadingText = this.$t(`USER_IS_OFFLINE`);
           setTimeout(() => {
-            this.checkCallLoader = false;
-            this.overlay         = false;
+            // redirect to contact page
+            this.$router.push({
+              path: "/contacts"
+            })
           }, 3000);
-        } else if (response.message === 'busy') {
-          this.overlayMessage = 'the user is busy';
+        } else if (response.message === 'user is busy') {
+          this.loadingText = 'the user is busy';
           setTimeout(() => {
-            this.checkCallLoader = false;
-            this.overlay         = false;
+            // redirect to contact page
+            this.$router.push({
+              path: "/contacts"
+            })
           }, 3000)
         }
       }
     });
 
-    socketIO.on('someOneCallYou', (username) => {
-      this.overlay        = true;
-      this.overlayMessage = username + ' is Calling you now';
-      this.someOneCallMe  = true;
-      this.usernameCallMe = username;
-    });
-
-    socketIO.on('getRemoteStreamConfigs', (configs) => {
+    this.socket.on('getRemoteStreamConfigs', (configs) => {
       if (this.streams.remoteUserMediaStream != null) {
         let videoTrack = this.streams.remoteUserMediaStream.getTracks().find(streamTrack => streamTrack.kind === 'video');
         let audioTrack = this.streams.remoteUserMediaStream.getTracks().find(streamTrack => streamTrack.kind === 'audio');
@@ -368,12 +289,14 @@ export default {
       }
     });
 
-    socketIO.on('finishCall', () => {
-      socketIO.destroy();
-      this.overlay        = true;
-      this.overlayMessage = 'Call Ended!';
+    this.socket.on('endCall', () => {
+      this.loading     = true;
+      this.loadingText = this.$t(`CALL_ENDED`);
       setTimeout(() => {
-        location.reload();
+        // redirect to contact page
+        this.$router.push({
+          path: "/contacts"
+        })
       }, 1500);
     });
 
@@ -438,7 +361,7 @@ export default {
           }
         ).then(screenShareStream => {
           screenShareStream.getTracks().forEach((track) => {
-            if (track.kind == 'audio') {
+            if (track.kind === 'audio') {
               track.name                                                        = 'screenShareAudio';
               this.streamsTracks.localTracks.screenShareTracks.screenShareAudio = track;
               let OutgoingAudioMediaStream                                      = new MediaStream();
@@ -458,7 +381,7 @@ export default {
                 }
               }
             }
-            if (track.kind == 'video') {
+            if (track.kind === 'video') {
               track.name = 'screenShareVideo';
               track.addEventListener('ended', () => {
                 this.screenShare = false;
@@ -504,12 +427,11 @@ export default {
       }
     },
     checkUserMediaAccess() {
-
       DetectRTC.load(() => {
 
         this.userBrowser = DetectRTC.browser;
 
-        if (this.userBrowser.name == 'Chrome') {
+        if (this.userBrowser.name === 'Chrome') {
           // check camera access
           navigator.permissions.query({name: "camera"}).then((permissionStatus) => {
             switch (permissionStatus.state) {
@@ -564,54 +486,31 @@ export default {
             this.microphoneAccess = 0;
           }
         }
-
       });
     },
-    startCall() {
-      if (
-        this.callUserName !== '' &&
-        this.callUserName.length === 10 &&
-        this.callUserName !== this.$store.state.userName
-      ) {
-        if (this.userMediaAccess === 1) {
-          socketIO.emit('checkCall', this.callUserName);
-          this.checkCallLoader = true;
-          this.overlay         = true;
-          this.overlayMessage  = 'Checking...';
-        } else {
-          this.overlay        = true;
-          this.overlayMessage = 'Please config settings of microphone and camera access to start call';
-          setTimeout(() => {
-            location.reload();
-          }, 3000);
-        }
-
-      } else {
-        this.snakbarType = -1;
-        this.snakbarText = 'username is wrong';
-        this.showSnakbar = true;
-      }
-    },
-    finishCall() {
-      socketIO.emit('finishCall', this.userNameOnCall);
-      socketIO.destroy();
-      this.overlay        = true;
-      this.overlayMessage = 'Call Ended!';
+    endCall() {
+      this.socket.emit('endCall', this.peerUser);
+      this.loading     = true;
+      this.loadingText = this.$t(`CALL_ENDED`);
       setTimeout(() => {
-        location.reload();
+        // redirect to contact page
+        this.$router.push({
+          path: "/contacts"
+        })
       }, 1500);
     },
     getStream(streamName) {
-      if (streamName === 'local') {
-        return this.streams.localUserMediaStream;
-      } else if (streamName === 'remote') {
-        return this.streams.remoteUserMediaStream;
-      } else if (streamName === 'localScreenShare') {
-        return this.streams.localScreenShareStream;
+      switch (streamName) {
+        case 'local':
+          return this.streams.localUserMediaStream;
+        case 'remote':
+          return this.streams.remoteUserMediaStream;
+        case 'localScreenShare':
+          return this.streams.localScreenShareStream;
       }
     },
     getStreamName(stream) {
-      if (stream.username === this.$store.state.userName) {
+      if (stream.username === this.userId) {
         return 'Me';
       } else {
         return stream.username;
@@ -625,29 +524,20 @@ export default {
     },
     getUserMediaAccess(callback) {
 
-      this.$nextTick(() => {
-        this.userMediaAccessLoader = true;
-      });
-
       let audioOptions = {
         echoCancellation: this.echoCancellation,
         noiseSuppression: this.noiseSuppression,
         sampleRate      : 48000
       };
 
-      let videoOptions = {
-        frameRate: {
-          min  : 30,
-          ideal: 60
-        },
-      };
+      let videoOptions = {};
 
-      if (this.$store.state.selectedMicrophoneId != '') {
-        audioOptions.deviceId = {exact: this.$store.state.selectedMicrophoneId};
+      if (this.selectedMicrophoneId !== '') {
+        audioOptions.deviceId = {exact: this.selectedMicrophoneId};
       }
 
-      if (this.$store.state.selectedCameraId != '') {
-        videoOptions.deviceId = {exact: this.$store.state.selectedCameraId};
+      if (this.selectedCameraId !== '') {
+        videoOptions.deviceId = {exact: this.selectedCameraId};
       }
 
       navigator.getUserMedia = (
@@ -657,46 +547,45 @@ export default {
         navigator.msGetUserMedia
       );
 
-      navigator.getUserMedia({audio: audioOptions, video: videoOptions}, (userMediaStream) => {
+      navigator.getUserMedia({
+        audio: audioOptions, video: (this.roomInfo.type === 1 ? videoOptions : false)
+      }, (userMediaStream) => {
         userMediaStream.getTracks().forEach((track) => {
-          if (track.kind == 'audio') {
-            if (this.$store.state.selectedMicrophoneId == '') {
-              this.$store.commit('saveSelectedMicrophoneId', track.getSettings().deviceId);
+          if (track.kind === 'audio') {
+            if (this.selectedMicrophoneId === '') {
+              this.$store.commit('call/saveSelectedMicrophoneId', track.getSettings().deviceId);
             }
             track.name                                                = 'microphone';
             this.streamsTracks.localTracks.userMediaTracks.microphone = track;
           }
-          if (track.kind == 'video') {
-            if (this.$store.state.selectedCameraId == '') {
-              this.$store.commit('saveSelectedCameraId', track.getSettings().deviceId);
+          if (track.kind === 'video') {
+            if (this.$store.state.selectedCameraId === '') {
+              this.$store.commit('call/saveSelectedCameraId', track.getSettings().deviceId);
             }
             track.name                                            = 'camera';
             track.enabled                                         = false;
             this.streamsTracks.localTracks.userMediaTracks.camera = track;
           }
         });
+
         this.microphone = true;
         this.camera     = false;
+
         this.refreshLocalUserMediaStream(() => {
           if (callback && typeof callback === 'function') {
             callback();
           }
         });
+
         this.userMediaAccess = 1;
-        this.$nextTick(() => {
-          this.userMediaAccessLoader = false;
-        });
       }, (e) => {
         this.userMediaAccess = -1;
-        this.$nextTick(() => {
-          this.userMediaAccessLoader = false;
-        });
         console.log(e);
       });
     },
     getUserDevices() {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
-        this.$store.commit('saveUserDevices', devices);
+        this.$store.commit('call/saveUserDevices', devices);
       });
     },
     refreshLocalUserMediaStream(callback) {
@@ -709,7 +598,7 @@ export default {
       if (this.streamsTracks.localTracks.userMediaTracks.camera != null) {
         localUserMediaStream.addTrack(this.streamsTracks.localTracks.userMediaTracks.camera);
       }
-      localUserMediaStream.username     = this.$store.state.userName;
+      localUserMediaStream.username     = this.userId;
       localUserMediaStream.name         = 'local';
       this.streams.localUserMediaStream = localUserMediaStream;
       if (callback && typeof callback === 'function') {
@@ -729,37 +618,14 @@ export default {
         localScreenShareStream.addTrack(this.streamsTracks.localTracks.screenShareTracks.screenShareVideo);
       }
       localScreenShareStream.name         = 'localScreenShare';
-      localScreenShareStream.username     = this.$store.state.userName;
+      localScreenShareStream.username     = this.userId;
       this.streams.localScreenShareStream = localScreenShareStream;
-    },
-    acceptCall() {
-      if (this.userMediaAccess === 1) {
-        this.overlayMessage = 'Connecting...';
-        this.someOneCallMe  = false;
-        socketIO.emit('acceptCall', this.usernameCallMe, this.$peer.id);
-      } else {
-        this.declineCall();
-        this.overlayMessage = 'Please config settings of microphone and camera access to accept call';
-        setTimeout(() => {
-          location.reload();
-        }, 3000);
-        this.someOneCallMe = false;
-      }
-    },
-    declineCall() {
-      socketIO.emit('declineCall', this.usernameCallMe);
-      this.overlayMessage = 'Declined!';
-      this.someOneCallMe  = false;
-      setTimeout(() => {
-        this.overlay = false;
-      }, 3000);
     },
     selectAsMainStream(streamObject) {
       this.mainStream = streamObject.name;
     },
-
   },
-  watch: {
+  watch  : {
     userMediaAccess(val, oldval) {
       if (oldval === 0 && val === 1) {
         setTimeout(() => {

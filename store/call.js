@@ -3,6 +3,17 @@ export const state = () => ({
   selectedCameraId    : '',
   noiseSuppression    : true,
   echoCancellation    : true,
+  devices             : []
 })
 
-export const mutations = {}
+export const mutations = {
+  saveSelectedMicrophoneId(state, microphoneId) {
+    state.selectedMicrophoneId = microphoneId;
+  },
+  saveSelectedCameraId(state, cameraId) {
+    state.selectedCameraId = cameraId;
+  },
+  saveUserDevices(state, devices) {
+    state.devices = devices;
+  }
+}

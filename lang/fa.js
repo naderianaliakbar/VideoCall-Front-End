@@ -58,6 +58,12 @@ let messages = {
   PERMISSION_DENIED     : 'شما به این قسمت دسترسی ندارید',
   LOADING               : 'در حال بارگزاری',
   PREPARING_CALL        : 'در حال آماده سازی تماس',
+  CONNECTING            : 'در حال اتصال',
+  DECLINED              : 'تماس رد شد',
+  CALLING               : 'در حال تماس',
+  USER_IS_BUSY          : 'کاربر مشغول است',
+  USER_IS_OFFLINE       : 'کاربر آفلاین است',
+  CALL_ENDED            : 'اتمام تماس',
 };
 
 export default messages;

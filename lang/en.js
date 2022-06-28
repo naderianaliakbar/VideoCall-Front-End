@@ -59,6 +59,12 @@ let messages = {
   PERMISSION_DENIED     : 'Permission Denied',
   LOADING               : 'Loading',
   PREPARING_CALL        : 'Preparing Call',
+  CONNECTING            : 'Connecting',
+  DECLINED              : 'Declined',
+  CALLING               : 'Calling',
+  USER_IS_BUSY          : 'the user is busy',
+  USER_IS_OFFLINE       : 'the user is offline',
+  CALL_ENDED            : 'Call Ended',
 };
 
 export default messages;
