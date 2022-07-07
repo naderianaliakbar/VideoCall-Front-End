@@ -3,55 +3,76 @@
     <!-- Toast  -->
     <Snackbar/>
 
-    <!-- Network identifier  -->
-    <v-overlay :value="!connected" opacity="1">
+
+    <v-overlay :value="overlay" opacity="1">
+
+      <!-- Network identifier  -->
       <div v-if="!connected">
-        <v-row class="d-flex justify-center my-3">
-          <v-icon class="d-block" color="red" size="100">mdi-network-off-outline</v-icon>
-        </v-row>
-        <h3>{{ $t(`NETWORK_OFF`) }}</h3>
-        <h3>{{ $t(`RECONNECTING`) }}...</h3>
+        <div v-if="!connected">
+          <v-row class="d-flex justify-center my-3">
+            <v-icon class="d-block" color="red" size="100">mdi-network-off-outline</v-icon>
+          </v-row>
+          <h3>{{ $t(`NETWORK_OFF`) }}</h3>
+          <h3>{{ $t(`RECONNECTING`) }}...</h3>
+        </div>
+        <div v-if="connected">
+          <v-row class="d-flex justify-center my-3">
+            <v-icon class="d-block" color="green" size="100">mdi-network-outline</v-icon>
+          </v-row>
+          <h3>{{ $t(`CONNECTED`) }}</h3>
+        </div>
       </div>
-      <div v-if="connected">
+
+      <!-- Call Notifier  -->
+      <div v-if="callNotify">
+        <!--   Avatar   -->
         <v-row class="d-flex justify-center my-3">
-          <v-icon class="d-block" color="green" size="100">mdi-network-outline</v-icon>
+          <ContactAvatar :avatar="callInfo.user.avatar"
+                         :name="callInfo.user.firstName"
+                         :color="callInfo.user.color" :size="180"/>
         </v-row>
-        <h3>{{ $t(`CONNECTED`) }}</h3>
+        <!--   Name   -->
+        <v-row class="d-flex justify-center my-3">
+          <p class="mt-12 text-h4">{{ callInfo.user.firstName + ' ' + callInfo.user.lastName }}</p>
+        </v-row>
+        <!--   Action Buttons   -->
+        <v-row class="d-flex justify-center my-5">
+          <v-btn class="red mx-10" width="70" height="70" @click="rejectCall" icon>
+            <v-icon>mdi-phone-hangup-outline</v-icon>
+          </v-btn>
+          <v-btn class="green mx-10" width="70" height="70" @click="acceptCall" icon>
+            <v-icon>mdi-phone-outline</v-icon>
+          </v-btn>
+        </v-row>
       </div>
-    </v-overlay>
 
-    <!-- Call Notifier  -->
-    <v-overlay :value="(callNotify && callInfo.user.length)" opacity="1">
-      <!--   Avatar   -->
-      <v-row class="d-flex justify-center my-3">
-        <ContactAvatar :avatar="callInfo.user.avatar"
-                       :name="callInfo.user.firstName"
-                       :color="callInfo.user.color" :size="180"/>
-      </v-row>
-      <!--   Name   -->
-      <v-row class="d-flex justify-center my-3">
-        <p class="mt-12 text-h4">{{ callInfo.user.firstName + ' ' + callInfo.user.lastName }}</p>
-      </v-row>
-      <!--   Action Buttons   -->
-      <v-row class="d-flex justify-center my-5">
-        <v-btn class="red mx-10" width="70" height="70" @click="rejectCall" icon>
-          <v-icon>mdi-phone-hangup-outline</v-icon>
-        </v-btn>
-        <v-btn class="green mx-10" width="70" height="70" @click="acceptCall" icon>
-          <v-icon>mdi-phone-outline</v-icon>
-        </v-btn>
-      </v-row>
-    </v-overlay>
-
-    <!-- socket Connect Overlay  -->
-    <v-overlay :value="socketConnectError" opacity="1">
-      <div>
+      <!-- Socket Connect  -->
+      <div v-if="socketConnectError">
         <v-row class="d-flex justify-center my-3">
           <v-icon class="d-block" color="red" size="100">mdi-connection</v-icon>
         </v-row>
         <h3>{{ $t(`USER_CONNECT_ERROR`) }}</h3>
       </div>
+
+      <!-- User Media Request -->
+      <div v-if="userMediaReq">
+        <v-row class="d-flex justify-center my-3">
+          <v-icon v-if="userMediaReqType === 1" class="mx-2" size="100">mdi-camera-off-outline</v-icon>
+          <v-icon class="mx-2" size="100">mdi-microphone-off</v-icon>
+        </v-row>
+        <v-row class="d-flex justify-center my-3">
+          <h3 v-if="userMediaReqType === 0 && userMediaAccess !== -1">{{ $t(`MICROPHONE_REQUEST`) }}</h3>
+          <h3 v-if="userMediaReqType === 1 && userMediaAccess !== -1">{{ $t(`MEDIA_REQUEST`) }}</h3>
+        </v-row>
+        <v-row class="d-flex justify-center my-3">
+          <h3 v-if="userMediaAccess !== -1">{{ $t(`CLICK_ALLOW`) }}</h3>
+          <h3 class="red--text" v-if="userMediaAccess === -1">{{ $t(`ACCESS_PROBLEM`) }}</h3>
+        </v-row>
+
+      </div>
+
     </v-overlay>
+
 
     <!--  Navigation drawer  -->
     <v-navigation-drawer
@@ -165,22 +186,30 @@
 <script>
 import {localize} from "vee-validate";
 
+let DetectRTC = require('detectrtc');
 
 export default {
   name: 'DefaultLayout',
   data() {
     return {
-      title     : 'Exoroya',
-      render    : false,
-      userMenu  : false,
-      drawerMenu: false,
-      connected : true,
-      callNotify: true,
-      socket    : '',
-      callInfo  : {
+      title           : 'Exoroya',
+      render          : false,
+      overlay         : false,
+      userMenu        : false,
+      drawerMenu      : false,
+      connected       : true,
+      callNotify      : false,
+      userMediaReq    : false,
+      userMediaReqType: 0,
+      socket          : '',
+      callInfo        : {
         _id : '',
         user: []
-      }
+      },
+      microphoneAccess: '',
+      cameraAccess    : '',
+      userMediaAccess : '',
+      userBrowser     : undefined,
     }
   },
   watch   : {
@@ -198,7 +227,63 @@ export default {
           this.$websocket.destroyConnection();
         }
       }
-    }
+    },
+    userMediaAccess(val) {
+      this.$store.commit('call/saveUserMediaAccess', val);
+      if (val === 1) {
+        this.getUserDevices();
+      }
+    },
+    cameraAccess(val) {
+
+      this.$store.commit('call/saveCameraAccess', val);
+
+      if (val === -1 || this.microphoneAccess === -1) {
+        this.userMediaAccess = -1;
+      }
+
+      if (val === 0 && this.microphoneAccess === 0) {
+        this.userMediaAccess = 0;
+      }
+
+      if (val === 1 && this.microphoneAccess === 1) {
+        this.userMediaAccess = 1;
+      }
+
+    },
+    microphoneAccess(val) {
+
+      this.$store.commit('call/saveMicrophoneAccess', val);
+
+      if (val === -1 || this.cameraAccess === -1) {
+        this.userMediaAccess = -1;
+      }
+
+      if (val === 0 && this.cameraAccess === 0) {
+        this.userMediaAccess = 0;
+      }
+
+      if (val === 1 && this.cameraAccess === 1) {
+        this.userMediaAccess = 1;
+      }
+
+    },
+    connected(val) {
+      this.overlay = (!val || this.callNotify || this.socketConnectError || this.userMediaReq);
+    },
+    callNotify(val) {
+      this.overlay = (val || !this.connected || this.socketConnectError || this.userMediaReq);
+    },
+    socketConnectError(val) {
+      this.overlay = (val || this.callNotify || !this.connected || this.userMediaReq);
+    },
+    userMediaReq(val) {
+      if (val) {
+        this.getUserMediaAccess();
+      }
+
+      this.overlay = (val || this.callNotify || !this.connected || this.socketConnectError);
+    },
   },
   computed: {
     menuItems() {
@@ -250,6 +335,7 @@ export default {
   },
   created() {
     this.setLayoutLanguage();
+    this.checkUserMediaAccess();
   },
   methods: {
     setLayoutLanguage() {
@@ -287,7 +373,8 @@ export default {
       });
     },
     rejectCall() {
-      this.socket.emit('rejectCall', this.callInfo._id, this.callInfo.user._id);
+      this.socket.emit('rejectCall', this.callInfo.user._id, this.callInfo._id);
+      this.callNotify = false;
     },
     getCallInfo() {
       this.$axios.get('calls/' + this.callInfo._id).then(response => {
@@ -310,7 +397,93 @@ export default {
           });
         }
       });
-    }
+    },
+    checkUserMediaAccess() {
+      DetectRTC.load(() => {
+
+        this.userBrowser = DetectRTC.browser;
+
+        if (this.userBrowser.name === 'Chrome') {
+          // check camera access
+          navigator.permissions.query({name: "camera"}).then((permissionStatus) => {
+            switch (permissionStatus.state) {
+              case "prompt":
+                this.cameraAccess = 0;
+                break;
+              case "denied":
+                this.cameraAccess = -1;
+                break;
+              case "granted":
+                this.cameraAccess = 1;
+                break;
+            }
+
+            if (!permissionStatus.onchange) {
+              permissionStatus.onchange = () => {
+                this.checkUserMediaAccess();
+              }
+            }
+          });
+
+          // check microphone access
+          navigator.permissions.query({name: "microphone"}).then((permissionStatus) => {
+            switch (permissionStatus.state) {
+              case "prompt":
+                this.microphoneAccess = 0;
+                break;
+              case "denied":
+                this.microphoneAccess = -1;
+                break;
+              case "granted":
+                this.microphoneAccess = 1;
+                break;
+            }
+
+            if (!permissionStatus.onchange) {
+              permissionStatus.onchange = () => {
+                this.checkUserMediaAccess();
+              }
+            }
+          });
+        } else {
+          if (DetectRTC.isWebsiteHasWebcamPermissions) {
+            this.cameraAccess = 1;
+          } else {
+            this.cameraAccess = 0;
+          }
+
+          if (DetectRTC.isWebsiteHasMicrophonePermissions) {
+            this.microphoneAccess = 1;
+          } else {
+            this.microphoneAccess = 0;
+          }
+        }
+      });
+    },
+    getUserDevices() {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        this.$store.commit('call/saveUserDevices', devices);
+      });
+    },
+    getUserMediaAccess(callback) {
+      navigator.getUserMedia = (
+        navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia
+      );
+
+      navigator.getUserMedia({audio: true, video: true}, (userMediaStream) => {
+        userMediaStream.getTracks().forEach(function (track) {
+          console.log(track);
+          track.stop();
+        });
+        this.checkUserMediaAccess();
+      }, (e) => {
+        this.userMediaAccess = -1;
+        console.log(e);
+      });
+    },
   }
 }
 </script>

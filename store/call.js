@@ -3,6 +3,11 @@ export const state = () => ({
   selectedCameraId    : '',
   noiseSuppression    : true,
   echoCancellation    : true,
+  userMediaAccess     : 0,
+  hasCamera           : false,
+  hasMicrophone       : false,
+  cameraAccess        : '',
+  microphoneAccess    : '',
   devices             : []
 })
 
@@ -15,5 +20,14 @@ export const mutations = {
   },
   saveUserDevices(state, devices) {
     state.devices = devices;
+  },
+  saveUserMediaAccess(state, accessState) {
+    state.userMediaAccess = accessState;
+  },
+  saveCameraAccess(state, accessState) {
+    state.cameraAccess = accessState;
+  },
+  saveMicrophoneAccess(state, accessState) {
+    state.microphoneAccess = accessState;
   }
 }

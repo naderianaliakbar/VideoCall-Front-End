@@ -328,39 +328,57 @@ export default {
       });
     },
     async createCall(type, id) {
-      this.createCallForm.loading = true;
-      this.createCallForm.id      = id;
-      this.createCallForm.type    = type;
-      await this.$axios.post('calls', {
-        contactId: this.createCallForm.id,
-        callType : type
-      }).then(async response => {
-        // set room id
-        this.$store.commit('user/setUserRoom', response.data.callId);
+      let flag = false;
 
-        // redirect to call page
-        this.$router.push({
-          path: "/call"
-        });
-      }).catch(({response}) => {
-        if (response.status) {
-          switch (response.status) {
-            case 400:
-              this.$notifier.showMessage({
-                content: this.$t(`NOT_FOUND`),
-                color  : 'error'
-              });
-              break;
-          }
-        } else {
-          this.$notifier.showMessage({
-            content: this.$t(`REQUEST_FAILED`),
-            color  : 'error'
+      if(type === 0 && this.$store.state.call.microphoneAccess === 1 && this.$store.state.call.hasMicrophone)
+      {
+
+      }
+
+      if(
+        type === 1 &&
+        this.$store.state.call.userMediaAccess === 1 &&
+        this.$store.state.call.hasMicrophone &&
+        this.$store.state.call.hasCamera
+      ) {
+
+      }
+
+      if(flag) {
+        this.createCallForm.loading = true;
+        this.createCallForm.id      = id;
+        this.createCallForm.type    = type;
+        await this.$axios.post('calls', {
+          contactId: this.createCallForm.id,
+          callType : type
+        }).then(async response => {
+          // set room id
+          this.$store.commit('user/setUserRoom', response.data.callId);
+
+          // redirect to call page
+          this.$router.push({
+            path: "/call"
           });
-        }
-      }).finally(() => {
-        this.createCallForm.loading = false;
-      });
+        }).catch(({response}) => {
+          if (response.status) {
+            switch (response.status) {
+              case 400:
+                this.$notifier.showMessage({
+                  content: this.$t(`NOT_FOUND`),
+                  color  : 'error'
+                });
+                break;
+            }
+          } else {
+            this.$notifier.showMessage({
+              content: this.$t(`REQUEST_FAILED`),
+              color  : 'error'
+            });
+          }
+        }).finally(() => {
+          this.createCallForm.loading = false;
+        });
+      }
     },
     showContextMenu(e, id) {
       e.preventDefault();

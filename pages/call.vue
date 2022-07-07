@@ -56,14 +56,10 @@ export default {
       connection          : null,
       microphone          : false,
       microphoneLoader    : false,
-      microphoneAccess    : '',
       camera              : false,
       cameraLoader        : false,
-      cameraAccess        : '',
       screenShare         : false,
       screenShareLoader   : false,
-      userMediaAccess     : '',
-      userBrowser         : undefined,
       deviceWidth         : 0,
       deviceHeight        : 0,
       mainStream          : 'local',
@@ -221,14 +217,14 @@ export default {
       }
     });
 
-    this.socket.on('callDeclined', () => {
-      this.loadingText = 'Declined';
+    this.socket.on('callRejected', () => {
+      this.loadingText = this.$t(`CALL_REJECTED`);
       setTimeout(() => {
         // redirect to contact page
         this.$router.push({
           path: "/contacts"
         })
-      }, 3000);
+      }, 1500);
     });
 
     this.socket.on('prepareCall', (response) => {
@@ -422,68 +418,6 @@ export default {
         this.screenShareLoader              = false;
       }
     },
-    checkUserMediaAccess() {
-      DetectRTC.load(() => {
-
-        this.userBrowser = DetectRTC.browser;
-
-        if (this.userBrowser.name === 'Chrome') {
-          // check camera access
-          navigator.permissions.query({name: "camera"}).then((permissionStatus) => {
-            switch (permissionStatus.state) {
-              case "prompt":
-                this.cameraAccess = 0;
-                break;
-              case "denied":
-                this.cameraAccess = -1;
-                break;
-              case "granted":
-                this.cameraAccess = 1;
-                break;
-            }
-
-            if (!permissionStatus.onchange) {
-              permissionStatus.onchange = () => {
-                this.checkUserMediaAccess();
-              }
-            }
-          });
-
-          // check microphone access
-          navigator.permissions.query({name: "microphone"}).then((permissionStatus) => {
-            switch (permissionStatus.state) {
-              case "prompt":
-                this.microphoneAccess = 0;
-                break;
-              case "denied":
-                this.microphoneAccess = -1;
-                break;
-              case "granted":
-                this.microphoneAccess = 1;
-                break;
-            }
-
-            if (!permissionStatus.onchange) {
-              permissionStatus.onchange = () => {
-                this.checkUserMediaAccess();
-              }
-            }
-          });
-        } else {
-          if (DetectRTC.isWebsiteHasWebcamPermissions) {
-            this.cameraAccess = 1;
-          } else {
-            this.cameraAccess = 0;
-          }
-
-          if (DetectRTC.isWebsiteHasMicrophonePermissions) {
-            this.microphoneAccess = 1;
-          } else {
-            this.microphoneAccess = 0;
-          }
-        }
-      });
-    },
     endCall() {
       this.socket.emit('endCall', this.peerUser);
       this.loading     = true;
@@ -577,11 +511,6 @@ export default {
       }, (e) => {
         this.userMediaAccess = -1;
         console.log(e);
-      });
-    },
-    getUserDevices() {
-      navigator.mediaDevices.enumerateDevices().then((devices) => {
-        this.$store.commit('call/saveUserDevices', devices);
       });
     },
     refreshLocalUserMediaStream(callback) {
@@ -680,49 +609,6 @@ export default {
     }
   },
   watch  : {
-    userMediaAccess(val, oldval) {
-      if (oldval === 0 && val === 1) {
-        setTimeout(() => {
-          this.streamsTracks.localTracks.userMediaTracks.microphone.stop();
-          this.streamsTracks.localTracks.userMediaTracks.camera.stop();
-        }, 2000);
-      }
-      if (val === 0) {
-        this.settingDialog = true;
-      } else {
-        this.getUserDevices();
-      }
-    },
-    cameraAccess(val) {
-
-      if (val == -1 || this.microphoneAccess == -1) {
-        this.userMediaAccess = -1;
-      }
-
-      if (val == 0 && this.microphoneAccess == 0) {
-        this.userMediaAccess = 0;
-      }
-
-      if (val == 1 && this.microphoneAccess == 1) {
-        this.userMediaAccess = 1;
-      }
-
-    },
-    microphoneAccess(val) {
-
-      if (val == -1 || this.cameraAccess == -1) {
-        this.userMediaAccess = -1;
-      }
-
-      if (val == 0 && this.cameraAccess == 0) {
-        this.userMediaAccess = 0;
-      }
-
-      if (val == 1 && this.cameraAccess == 1) {
-        this.userMediaAccess = 1;
-      }
-
-    },
     streams() {
       this.reRenderStreams();
     },
@@ -730,33 +616,33 @@ export default {
       this.reRenderStreams();
     },
     remoteStream(val) {
-      val.username                       = this.userNameOnCall;
+      val.username                       = this.peerUser;
       val.name                           = 'remote';
       this.streams.remoteUserMediaStream = val;
       this.mainStream                    = 'remote';
     },
     camera() {
-      if (this.userOnCall) {
+      if (this.peerUser) {
         this.reRenderStreams();
-        socketIO.emit('getRemoteStreamConfigs', this.userNameOnCall, {
+        this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
           video: this.camera || this.screenShare,
           audio: this.microphone || this.screenShare
         });
       }
     },
     microphone() {
-      if (this.userOnCall) {
+      if (this.peerUser) {
         this.reRenderStreams();
-        socketIO.emit('getRemoteStreamConfigs', this.userNameOnCall, {
+        this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
           video: this.camera || this.screenShare,
           audio: this.microphone || this.screenShare
         });
       }
     },
     screenShare() {
-      if (this.userOnCall) {
+      if (this.peerUser) {
         this.reRenderStreams();
-        socketIO.emit('getRemoteStreamConfigs', this.userNameOnCall, {
+        this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
           video: this.camera || this.screenShare,
           audio: this.microphone || this.screenShare
         });

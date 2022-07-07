@@ -65,6 +65,11 @@ let messages = {
   USER_IS_BUSY          : 'the user is busy',
   USER_IS_OFFLINE       : 'the user is offline',
   CALL_ENDED            : 'Call Ended',
+  CALL_REJECTED         : 'Call Rejected',
+  MICROPHONE_REQUEST    : 'To make a call, we need to enable microphone access',
+  MEDIA_REQUEST         : 'To make a call, we need to activate the microphone and camera access',
+  CLICK_ALLOW           : 'Click Allow in the Activation Request window',
+  ACCESS_PROBLEM        : 'There is an access problem. Please enable it from settings'
 };
 
 export default messages;
