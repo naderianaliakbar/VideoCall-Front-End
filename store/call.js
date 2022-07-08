@@ -4,10 +4,8 @@ export const state = () => ({
   noiseSuppression    : true,
   echoCancellation    : true,
   userMediaAccess     : 0,
-  hasCamera           : false,
-  hasMicrophone       : false,
-  cameraAccess        : '',
-  microphoneAccess    : '',
+  cameraAccess        : 0,
+  microphoneAccess    : 0,
   devices             : []
 })
 

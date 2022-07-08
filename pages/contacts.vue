@@ -328,23 +328,10 @@ export default {
       });
     },
     async createCall(type, id) {
-      let flag = false;
-
-      if(type === 0 && this.$store.state.call.microphoneAccess === 1 && this.$store.state.call.hasMicrophone)
-      {
-
-      }
-
       if(
-        type === 1 &&
-        this.$store.state.call.userMediaAccess === 1 &&
-        this.$store.state.call.hasMicrophone &&
-        this.$store.state.call.hasCamera
+        (type === 0 && this.$store.state.call.microphoneAccess === 1) ||
+        (type === 1 && this.$store.state.call.userMediaAccess === 1)
       ) {
-
-      }
-
-      if(flag) {
         this.createCallForm.loading = true;
         this.createCallForm.id      = id;
         this.createCallForm.type    = type;
@@ -378,6 +365,8 @@ export default {
         }).finally(() => {
           this.createCallForm.loading = false;
         });
+      } else {
+        this.$root.$emit('getUserMediaAccess', type);
       }
     },
     showContextMenu(e, id) {

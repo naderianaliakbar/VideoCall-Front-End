@@ -61,12 +61,12 @@
           <v-icon class="mx-2" size="100">mdi-microphone-off</v-icon>
         </v-row>
         <v-row class="d-flex justify-center my-3">
-          <h3 v-if="userMediaReqType === 0 && userMediaAccess !== -1">{{ $t(`MICROPHONE_REQUEST`) }}</h3>
-          <h3 v-if="userMediaReqType === 1 && userMediaAccess !== -1">{{ $t(`MEDIA_REQUEST`) }}</h3>
+          <h3 v-if="userMediaReqType === 0">{{ $t(`MICROPHONE_REQUEST`) }}</h3>
+          <h3 v-if="userMediaReqType === 1">{{ $t(`MEDIA_REQUEST`) }}</h3>
         </v-row>
         <v-row class="d-flex justify-center my-3">
-          <h3 v-if="userMediaAccess !== -1">{{ $t(`CLICK_ALLOW`) }}</h3>
-          <h3 class="red--text" v-if="userMediaAccess === -1">{{ $t(`ACCESS_PROBLEM`) }}</h3>
+          <h3 v-if="(userMediaAccess === 0 && userMediaReqType === 1) || (microphoneAccess === 0 && userMediaReqType === 0)">{{ $t(`CLICK_ALLOW`) }}</h3>
+          <h3 class="red--text" v-if="(userMediaAccess === -1 && userMediaReqType === 1) || (microphoneAccess === -1 && userMediaReqType === 0)">{{ $t(`ACCESS_PROBLEM`) }}</h3>
         </v-row>
 
       </div>
@@ -192,24 +192,25 @@ export default {
   name: 'DefaultLayout',
   data() {
     return {
-      title           : 'Exoroya',
-      render          : false,
-      overlay         : false,
-      userMenu        : false,
-      drawerMenu      : false,
-      connected       : true,
-      callNotify      : false,
-      userMediaReq    : false,
-      userMediaReqType: 0,
-      socket          : '',
-      callInfo        : {
+      title               : 'Exoroya',
+      render              : false,
+      overlay             : false,
+      userMenu            : false,
+      drawerMenu          : false,
+      connected           : true,
+      callNotify          : false,
+      userMediaReq        : false,
+      userMediaReqType    : 0,
+      userMediaReqCallBack: null,
+      socket              : '',
+      callInfo            : {
         _id : '',
         user: []
       },
-      microphoneAccess: '',
-      cameraAccess    : '',
-      userMediaAccess : '',
-      userBrowser     : undefined,
+      microphoneAccess    : '',
+      cameraAccess        : '',
+      userMediaAccess     : '',
+      userBrowser         : undefined,
     }
   },
   watch   : {
@@ -229,44 +230,28 @@ export default {
       }
     },
     userMediaAccess(val) {
-      this.$store.commit('call/saveUserMediaAccess', val);
+      this.$store.commit('call/saveUserMediaAccess', this.userMediaAccess);
       if (val === 1) {
         this.getUserDevices();
+        if (this.userMediaReqType === 1) {
+          this.userMediaReq = false;
+          if (this.userMediaReqCallBack) {
+            this.userMediaReqCallBack();
+          }
+        }
       }
     },
     cameraAccess(val) {
-
       this.$store.commit('call/saveCameraAccess', val);
-
-      if (val === -1 || this.microphoneAccess === -1) {
-        this.userMediaAccess = -1;
-      }
-
-      if (val === 0 && this.microphoneAccess === 0) {
-        this.userMediaAccess = 0;
-      }
-
-      if (val === 1 && this.microphoneAccess === 1) {
-        this.userMediaAccess = 1;
-      }
-
     },
     microphoneAccess(val) {
-
       this.$store.commit('call/saveMicrophoneAccess', val);
-
-      if (val === -1 || this.cameraAccess === -1) {
-        this.userMediaAccess = -1;
+      if (val === 1 && this.userMediaReqType === 0) {
+        this.userMediaReq = false;
+        if (this.userMediaReqCallBack) {
+          this.userMediaReqCallBack();
+        }
       }
-
-      if (val === 0 && this.cameraAccess === 0) {
-        this.userMediaAccess = 0;
-      }
-
-      if (val === 1 && this.cameraAccess === 1) {
-        this.userMediaAccess = 1;
-      }
-
     },
     connected(val) {
       this.overlay = (!val || this.callNotify || this.socketConnectError || this.userMediaReq);
@@ -332,10 +317,26 @@ export default {
       }
     }
 
+    // check UserMediaAccess Permissions
+    this.checkUserMediaPermissions();
+
+    // listen to userMediaAccess Request
+    this.$root.$on('getUserMediaAccess', (reqType, callback) => {
+      this.userMediaReqType = reqType;
+      this.userMediaReq     = true;
+      if (callback && typeof callback === 'function') {
+        this.userMediaReqCallBack = callback;
+      }
+    });
+
   },
   created() {
     this.setLayoutLanguage();
-    this.checkUserMediaAccess();
+
+    // Set UserMediaAccess Permissions
+    this.cameraAccess     = this.$store.state.call.cameraAccess;
+    this.microphoneAccess = this.$store.state.call.microphoneAccess;
+    this.userMediaAccess  = this.$store.state.call.userMediaAccess;
   },
   methods: {
     setLayoutLanguage() {
@@ -364,13 +365,26 @@ export default {
       });
     },
     acceptCall() {
-      // set room id
-      this.$store.commit('user/setUserRoom', this.callInfo._id);
-
-      // redirect to call page
-      this.$router.push({
-        path: "/call"
-      });
+      if (
+        (this.callInfo.type === 0 && this.$store.state.call.microphoneAccess === 1) ||
+        (this.callInfo.type === 1 && this.$store.state.call.userMediaAccess === 1)
+      ) {
+        // set room id
+        this.$store.commit('user/setUserRoom', this.callInfo._id);
+        // redirect to call page
+        this.$router.push({
+          path: "/call"
+        });
+      } else {
+        this.$root.$emit('getUserMediaAccess', this.callInfo.type, () => {
+          // set room id
+          this.$store.commit('user/setUserRoom', this.callInfo._id);
+          // redirect to call page
+          this.$router.push({
+            path: "/call"
+          });
+        });
+      }
     },
     rejectCall() {
       this.socket.emit('rejectCall', this.callInfo.user._id, this.callInfo._id);
@@ -398,7 +412,7 @@ export default {
         }
       });
     },
-    checkUserMediaAccess() {
+    checkUserMediaPermissions(callback) {
       DetectRTC.load(() => {
 
         this.userBrowser = DetectRTC.browser;
@@ -420,7 +434,7 @@ export default {
 
             if (!permissionStatus.onchange) {
               permissionStatus.onchange = () => {
-                this.checkUserMediaAccess();
+                this.checkUserMediaPermissions(callback);
               }
             }
           });
@@ -441,7 +455,7 @@ export default {
 
             if (!permissionStatus.onchange) {
               permissionStatus.onchange = () => {
-                this.checkUserMediaAccess();
+                this.checkUserMediaPermissions(callback);
               }
             }
           });
@@ -458,6 +472,10 @@ export default {
             this.microphoneAccess = 0;
           }
         }
+
+        if (callback && typeof callback === 'function') {
+          callback();
+        }
       });
     },
     getUserDevices() {
@@ -473,17 +491,33 @@ export default {
         navigator.msGetUserMedia
       );
 
-      navigator.getUserMedia({audio: true, video: true}, (userMediaStream) => {
-        userMediaStream.getTracks().forEach(function (track) {
-          console.log(track);
-          track.stop();
+      navigator.getUserMedia({audio: true, video: (this.userMediaReqType === 1)}, (userMediaStream) => {
+        this.checkUserMediaPermissions(() => {
+          this.checkUserMediaAccess();
+          userMediaStream.getTracks().forEach(function (track) {
+            track.stop();
+          });
         });
-        this.checkUserMediaAccess();
       }, (e) => {
-        this.userMediaAccess = -1;
-        console.log(e);
+        this.checkUserMediaPermissions( () => {
+          this.checkUserMediaAccess();
+        });
+        console.log(e, 'ERROR MEDIA ACCESS');
       });
     },
+    checkUserMediaAccess() {
+      if (this.cameraAccess === -1 || this.microphoneAccess === -1) {
+        this.userMediaAccess = -1;
+      }
+
+      if (this.cameraAccess === 0 && this.microphoneAccess === 0) {
+        this.userMediaAccess = 0;
+      }
+
+      if (this.cameraAccess === 1 && this.microphoneAccess === 1) {
+        this.userMediaAccess = 1;
+      }
+    }
   }
 }
 </script>
