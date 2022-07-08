@@ -4,7 +4,7 @@
     <Snackbar/>
 
 
-    <v-overlay :value="overlay" opacity="1">
+    <v-overlay class="pa-9" :value="overlay" opacity="1">
 
       <!-- Network identifier  -->
       <div v-if="!connected">
@@ -24,7 +24,7 @@
       </div>
 
       <!-- Call Notifier  -->
-      <div v-if="callNotify">
+      <div v-if="callNotify && !userMediaReq">
         <!--   Avatar   -->
         <v-row class="d-flex justify-center my-3">
           <ContactAvatar :avatar="callInfo.user.avatar"
@@ -61,15 +61,19 @@
           <v-icon class="mx-2" size="100">mdi-microphone-off</v-icon>
         </v-row>
         <v-row class="d-flex justify-center my-3">
-          <h3 v-if="userMediaReqType === 0">{{ $t(`MICROPHONE_REQUEST`) }}</h3>
-          <h3 v-if="userMediaReqType === 1">{{ $t(`MEDIA_REQUEST`) }}</h3>
+          <h3 class="text-justify" v-if="userMediaReqType === 0">{{ $t(`MICROPHONE_REQUEST`) }}</h3>
+          <h3 class="text-justify" v-if="userMediaReqType === 1">{{ $t(`MEDIA_REQUEST`) }}</h3>
         </v-row>
         <v-row class="d-flex justify-center my-3">
           <h3 v-if="(userMediaAccess === 0 && userMediaReqType === 1) || (microphoneAccess === 0 && userMediaReqType === 0)">{{ $t(`CLICK_ALLOW`) }}</h3>
-          <h3 class="red--text" v-if="(userMediaAccess === -1 && userMediaReqType === 1) || (microphoneAccess === -1 && userMediaReqType === 0)">{{ $t(`ACCESS_PROBLEM`) }}</h3>
+          <h3 class="red--text text-justify" v-if="(userMediaAccess === -1 && userMediaReqType === 1) || (microphoneAccess === -1 && userMediaReqType === 0)">{{ $t(`ACCESS_PROBLEM`) }}</h3>
         </v-row>
 
       </div>
+
+      <v-row class="d-flex justify-center mt-5" no-gutters>
+        <label style="position: fixed; bottom: 10px" class="overline">EXOROYA</label>
+      </v-row>
 
     </v-overlay>
 
@@ -81,16 +85,6 @@
       temporary
       fixed>
       <template v-slot:prepend>
-        <!--    logo    -->
-        <v-col cols="12" class="d-flex justify-center">
-          <nuxt-link to="/">
-            <v-img class="justify-center my-2"
-                   max-width="150px"
-                   src="mainLogo.svg"
-                   sizes="10">
-            </v-img>
-          </nuxt-link>
-        </v-col>
         <v-divider></v-divider>
         <v-list-item class="my-1" v-if="$auth.loggedIn" two-line>
           <v-list-item-avatar>
@@ -133,37 +127,32 @@
       </v-btn>
 
       <!--   Logo   -->
-      <nuxt-link to="/">
-        <v-img class=""
-               max-width="150px"
-               src="mainLogo.svg" sizes="10">
-        </v-img>
-      </nuxt-link>
+      <label class="overline text-h5 mt-1">EXOROYA</label>
 
       <v-spacer></v-spacer>
 
       <!--   Dashboard mobile LINK BUTTON  -->
-      <v-tooltip v-if="!$auth.loggedIn" bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn to="/login"
-                 class="mx-1"
-                 v-bind="attrs"
-                 v-on="on"
-                 outlined
-                 nuxt
-                 icon>
-            <v-icon>mdi-account</v-icon>
-          </v-btn>
-        </template>
-        <span>{{ $t(`LOGIN`) }}</span>
-      </v-tooltip>
+<!--      <v-tooltip v-if="!$auth.loggedIn" bottom>-->
+<!--        <template v-slot:activator="{ on, attrs }">-->
+<!--          <v-btn to="/login"-->
+<!--                 class="mx-1"-->
+<!--                 v-bind="attrs"-->
+<!--                 v-on="on"-->
+<!--                 outlined-->
+<!--                 nuxt-->
+<!--                 icon>-->
+<!--            <v-icon>mdi-account</v-icon>-->
+<!--          </v-btn>-->
+<!--        </template>-->
+<!--        <span>{{ $t(`LOGIN`) }}</span>-->
+<!--      </v-tooltip>-->
 
       <!--   DASHBOARD LINK BUTTON  -->
-      <nuxt-link v-if="$auth.loggedIn" to="/dashboard">
-        <ContactAvatar :avatar="$auth.user.avatar"
-                       :name="$auth.user.firstName"
-                       :color="$auth.user.color"/>
-      </nuxt-link>
+<!--      <nuxt-link v-if="$auth.loggedIn" to="/dashboard">-->
+<!--        <ContactAvatar :avatar="$auth.user.avatar"-->
+<!--                       :name="$auth.user.firstName"-->
+<!--                       :color="$auth.user.color"/>-->
+<!--      </nuxt-link>-->
 
     </v-app-bar>
 
@@ -179,6 +168,8 @@
       <label @click="changeLanguage('en')" class="v-card--link">English</label>
       &nbsp; | &nbsp;
       <label @click="changeLanguage('fa')" class="v-card--link">فارسی</label>
+      <v-spacer></v-spacer>
+      <label class="overline">EXOROYA</label>
     </v-footer>
   </v-app>
 </template>

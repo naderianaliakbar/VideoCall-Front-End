@@ -2,11 +2,11 @@
   <v-sheet>
     <!--  loading overlay  -->
     <v-overlay :value="loading" opacity="1">
-      <v-row no-gutters>
+      <v-row class="d-flex justify-center" no-gutters>
         <h1>{{ loadingText }}</h1>
       </v-row>
       <v-row class="d-flex justify-center mt-5" no-gutters>
-        <v-progress-circular indeterminate></v-progress-circular>
+        <label style="position: fixed; bottom: 10px" class="overline">EXOROYA</label>
       </v-row>
     </v-overlay>
 
