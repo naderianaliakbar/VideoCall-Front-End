@@ -65,8 +65,12 @@
           <h3 class="text-justify" v-if="userMediaReqType === 1">{{ $t(`MEDIA_REQUEST`) }}</h3>
         </v-row>
         <v-row class="d-flex justify-center my-3">
-          <h3 v-if="(userMediaAccess === 0 && userMediaReqType === 1) || (microphoneAccess === 0 && userMediaReqType === 0)">{{ $t(`CLICK_ALLOW`) }}</h3>
-          <h3 class="red--text text-justify" v-if="(userMediaAccess === -1 && userMediaReqType === 1) || (microphoneAccess === -1 && userMediaReqType === 0)">{{ $t(`ACCESS_PROBLEM`) }}</h3>
+          <h3
+            v-if="(userMediaAccess === 0 && userMediaReqType === 1) || (microphoneAccess === 0 && userMediaReqType === 0)">
+            {{ $t(`CLICK_ALLOW`) }}</h3>
+          <h3 class="red--text text-justify"
+              v-if="(userMediaAccess === -1 && userMediaReqType === 1) || (microphoneAccess === -1 && userMediaReqType === 0)">
+            {{ $t(`ACCESS_PROBLEM`) }}</h3>
         </v-row>
 
       </div>
@@ -132,27 +136,27 @@
       <v-spacer></v-spacer>
 
       <!--   Dashboard mobile LINK BUTTON  -->
-<!--      <v-tooltip v-if="!$auth.loggedIn" bottom>-->
-<!--        <template v-slot:activator="{ on, attrs }">-->
-<!--          <v-btn to="/login"-->
-<!--                 class="mx-1"-->
-<!--                 v-bind="attrs"-->
-<!--                 v-on="on"-->
-<!--                 outlined-->
-<!--                 nuxt-->
-<!--                 icon>-->
-<!--            <v-icon>mdi-account</v-icon>-->
-<!--          </v-btn>-->
-<!--        </template>-->
-<!--        <span>{{ $t(`LOGIN`) }}</span>-->
-<!--      </v-tooltip>-->
+      <!--      <v-tooltip v-if="!$auth.loggedIn" bottom>-->
+      <!--        <template v-slot:activator="{ on, attrs }">-->
+      <!--          <v-btn to="/login"-->
+      <!--                 class="mx-1"-->
+      <!--                 v-bind="attrs"-->
+      <!--                 v-on="on"-->
+      <!--                 outlined-->
+      <!--                 nuxt-->
+      <!--                 icon>-->
+      <!--            <v-icon>mdi-account</v-icon>-->
+      <!--          </v-btn>-->
+      <!--        </template>-->
+      <!--        <span>{{ $t(`LOGIN`) }}</span>-->
+      <!--      </v-tooltip>-->
 
       <!--   DASHBOARD LINK BUTTON  -->
-<!--      <nuxt-link v-if="$auth.loggedIn" to="/dashboard">-->
-<!--        <ContactAvatar :avatar="$auth.user.avatar"-->
-<!--                       :name="$auth.user.firstName"-->
-<!--                       :color="$auth.user.color"/>-->
-<!--      </nuxt-link>-->
+      <!--      <nuxt-link v-if="$auth.loggedIn" to="/dashboard">-->
+      <!--        <ContactAvatar :avatar="$auth.user.avatar"-->
+      <!--                       :name="$auth.user.firstName"-->
+      <!--                       :color="$auth.user.color"/>-->
+      <!--      </nuxt-link>-->
 
     </v-app-bar>
 
@@ -362,6 +366,9 @@ export default {
       ) {
         // set room id
         this.$store.commit('user/setUserRoom', this.callInfo._id);
+
+        this.callNotify = false;
+
         // redirect to call page
         this.$router.push({
           path: "/call"
@@ -370,6 +377,9 @@ export default {
         this.$root.$emit('getUserMediaAccess', this.callInfo.type, () => {
           // set room id
           this.$store.commit('user/setUserRoom', this.callInfo._id);
+
+          this.callNotify = false;
+
           // redirect to call page
           this.$router.push({
             path: "/call"
@@ -490,7 +500,7 @@ export default {
           });
         });
       }, (e) => {
-        this.checkUserMediaPermissions( () => {
+        this.checkUserMediaPermissions(() => {
           this.checkUserMediaAccess();
         });
         console.log(e, 'ERROR MEDIA ACCESS');

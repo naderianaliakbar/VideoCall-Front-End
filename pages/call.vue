@@ -11,29 +11,27 @@
     </v-overlay>
 
     <!--    Call Page    -->
-    <div class="gridVideos pt-0 pl-3 pr-3" v-if="!loading">
+    <v-sheet color="white" class="gridVideos mt-5" v-if="!loading">
       <v-row>
-        <v-col class="mainStream pa-0 pt-3" cols="12" sm="12" md="9" lg="9" xl="9">
+        <v-col class="mainStream pa-0" cols="12" sm="12" md="9" lg="9" xl="9">
           <Stream v-if="renderStreams"
                   :isMainStream="true"
-                  :srcObject="getStream(mainStream)"
-                  :streamName="getStreamName(getStream(mainStream))"/>
+                  :srcObject="getStream(mainStream)"/>
         </v-col>
-        <v-col class="listOfStreams pr-0 pl-2 pb-0 pt-4" cols="12" sm="12" md="3" lg="3" xl="3">
-          <v-list subheader>
+        <v-col class="listOfStreams px-0 mx-0 pa-0" cols="12" sm="12" md="3" lg="3" xl="3">
+          <v-list width="100%" height="100%" class="mx-0">
             <v-list-item v-for="(stream,index) in streams"
                          :key="index"
-                         class="streamItem pr-0 pl-0 pt-1 pb-1"
+                         class="streamItem pt-1 pb-1"
                          v-if="stream != null && renderStreams">
               <Stream @selectAsMainStream="selectAsMainStream"
                       :isMainStream="false"
-                      :srcObject="getStream(stream.name)"
-                      :streamName="getStreamName(stream)"/>
+                      :srcObject="getStream(stream.name)"/>
             </v-list-item>
           </v-list>
         </v-col>
       </v-row>
-    </div>
+    </v-sheet>
 
 
   </v-sheet>
@@ -82,14 +80,14 @@ export default {
       },
       renderStreams       : false,
       peerConnectionConfig: {
-        iceTransportPolicy: 'relay',
-        iceServers        : [
-          {
-            urls      : 'turn:turn.exoroya.ir',
-            credential: '123',
-            username  : 'abc'
-          },
-        ]
+        // iceTransportPolicy: 'relay',
+        // iceServers        : [
+        //   {
+        //     urls      : 'turn:turn.exoroya.ir',
+        //     credential: '123',
+        //     username  : 'abc'
+        //   },
+        // ]
       }
     };
   },
@@ -115,16 +113,16 @@ export default {
         return navigator.userAgent.match(toMatchItem);
       });
     },
-    selectedMicrophoneId: () => {
+    selectedMicrophoneId() {
       return this.$store.state.call.selectedMicrophoneId;
     },
-    selectedCameraId    : () => {
+    selectedCameraId() {
       return this.$store.state.call.selectedCameraId;
     },
-    noiseSuppression    : () => {
+    noiseSuppression() {
       return this.$store.state.call.noiseSuppression;
     },
-    echoCancellation    : () => {
+    echoCancellation() {
       return this.$store.state.call.echoCancellation;
     },
   },
@@ -440,10 +438,10 @@ export default {
       }
     },
     getStreamName(stream) {
-      if (stream.username === this.userId) {
+      if (stream.user._id === this.userId) {
         return 'Me';
       } else {
-        return stream.username;
+        return stream.user.firstName;
       }
     },
     reRenderStreams() {
@@ -523,7 +521,7 @@ export default {
       if (this.streamsTracks.localTracks.userMediaTracks.camera != null) {
         localUserMediaStream.addTrack(this.streamsTracks.localTracks.userMediaTracks.camera);
       }
-      localUserMediaStream.username     = this.userId;
+      localUserMediaStream.user         = this.$auth.user;
       localUserMediaStream.name         = 'local';
       this.streams.localUserMediaStream = localUserMediaStream;
       if (callback && typeof callback === 'function') {
@@ -543,7 +541,7 @@ export default {
         localScreenShareStream.addTrack(this.streamsTracks.localTracks.screenShareTracks.screenShareVideo);
       }
       localScreenShareStream.name         = 'localScreenShare';
-      localScreenShareStream.username     = this.userId;
+      localScreenShareStream.user         = this.$auth.user;
       this.streams.localScreenShareStream = localScreenShareStream;
     },
     selectAsMainStream(streamObject) {
@@ -552,7 +550,7 @@ export default {
     createConnection(callback) {
 
       // creating peerConnection
-      this.connection = new RTCPeerConnection(this.peerConnectionConfig);
+      this.connection = new RTCPeerConnection();
 
       if (this.streamsTracks.localTracks.userMediaTracks.microphone != null) {
         // add microphone track to connection
@@ -572,10 +570,10 @@ export default {
       this.connection.ontrack = (rtcTrack) => {
         // create remote media stream
         if (this.streams.remoteUserMediaStream === null) {
-          this.streams.remoteUserMediaStream          = new MediaStream();
-          this.streams.remoteUserMediaStream.name     = 'remote';
-          this.streams.remoteUserMediaStream.username = this.peerUser;
-          this.mainStream                             = 'remote';
+          this.streams.remoteUserMediaStream      = new MediaStream();
+          this.streams.remoteUserMediaStream.name = 'remote';
+          this.streams.remoteUserMediaStream.user = this.roomInfo.user;
+          this.mainStream                         = 'remote';
         }
         // add track
         this.streams.remoteUserMediaStream.addTrack(rtcTrack.track);
@@ -616,7 +614,7 @@ export default {
       this.reRenderStreams();
     },
     remoteStream(val) {
-      val.username                       = this.peerUser;
+      val.user                           = this.roomInfo.user;
       val.name                           = 'remote';
       this.streams.remoteUserMediaStream = val;
       this.mainStream                    = 'remote';
@@ -653,5 +651,51 @@ export default {
 </script>
 
 <style scoped>
+.gridVideos {
+  width: 100% !important;
+}
+
+.gridVideos .listOfStreams {
+  min-height: calc(100vh - 150px);
+  max-height: calc(100vh - 150px);
+}
+
+.gridVideos .listOfStreams .streamItem {
+  display: block;
+  height: 160px;
+}
+
+.gridVideos .mainStream {
+  max-height: calc(100vh - 150px);
+  min-height: calc(100vh - 150px);
+}
+
+.gridVideos .listOfStreams {
+  width: 100%;
+}
+
+@media screen and (max-width: 959px) {
+  .gridVideos .mainStream {
+    min-height: calc(74vh);
+    max-height: calc(74vh);
+  }
+
+  .gridVideos .listOfStreams {
+    min-height: 185px;
+    max-height: 185px;
+    overflow-x: scroll;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .gridVideos .listOfStreams .streamItem {
+    display: inline-block;
+    text-decoration: none;
+    height: 140px;
+    width: 49%;
+    max-width: 49%;
+  }
+
+}
 
 </style>

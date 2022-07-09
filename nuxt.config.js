@@ -47,27 +47,13 @@ export default {
   ],
   // auth
   auth: {
-    strategies: {
-      google: {
-        clientId           : '',
-        redirectUri        : '',
-        codeChallengeMethod: '',
-        responseType       : 'code',
-        grantType          : 'google',
-        endpoints          : {
-          token   : '/loginByGoogle',
-          userInfo: '/user'
-        },
-        user               : {
-          property : 'user',
-          autoFetch: false
-        }
-      },
+    localStorage: false,
+    resetOnError: true,
+    strategies  : {
       local : {
         token    : {
           property  : 'token',
           global    : true,
-          autoLogout: true,
           maxAge    : 60 * 60 * 24 * 7
         },
         user     : {

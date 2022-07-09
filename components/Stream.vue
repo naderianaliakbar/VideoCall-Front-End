@@ -13,60 +13,40 @@
       lights-out
       absolute
       dark>
-      <v-icon color="white" v-if="cameraOff" class="mx-1">mdi-camera-off-outline</v-icon>
-      <v-icon color="white" v-if="audioOff" class="mx-1">mdi-microphone-off</v-icon>
-      <v-avatar v-if="streamName != 'Me'"
-                class="ml-1 mr-1"
-                color="black"
-                size="20">
-        {{ streamName.substr(0, 1) }}
-      </v-avatar>
-      <h5 class="font-weight-bold white--text">{{ streamName }}</h5>
+      <ContactAvatar :avatar="srcObject.user.avatar"
+                     :name="srcObject.user.firstName"
+                     :color="srcObject.user.color" size="50"/>
+      <h5 class="caption white--text mx-2">{{ streamName }}</h5>
     </v-system-bar>
   </v-card>
 </template>
 
 <script>
 export default {
-  name : "StreamObject",
-  data : () => {
+  name   : "StreamObject",
+  data   : () => {
     return {
-      cameraOff: false,
-      audioOff : false
+      streamName: '',
+      cameraOff : false,
+      audioOff  : false
     }
   },
-  methods:{
-    selectAsMainStream(){
-      if(!this.isMainStream){
-        this.$emit('selectAsMainStream',this.srcObject);
+  methods: {
+    selectAsMainStream() {
+      if (!this.isMainStream) {
+        this.$emit('selectAsMainStream', this.srcObject);
       }
     }
   },
-  props: ['srcObject', 'streamName', 'isMainStream'],
-  created() {
-  },
+  props  : ['srcObject', 'isMainStream'],
   mounted() {
     this.$refs.videoObject.srcObject = this.srcObject;
-    if (this.streamName == 'Me') {
+    if (this.srcObject.user._id === this.$auth.user.id) {
       this.$refs.videoObject.muted = true;
-    }
-
-    let videoTrack = (this.srcObject.getTracks().find(stream => stream.kind === 'video'));
-    let audioTrack = (this.srcObject.getTracks().find(stream => stream.kind === 'audio'));
-
-
-    if (videoTrack !== undefined && videoTrack.enabled === true) {
-      this.cameraOff = false;
+      this.streamName              = 'Me';
     } else {
-      this.cameraOff = true;
+      this.streamName = this.srcObject.user.firstName;
     }
-
-    if (audioTrack !== undefined && audioTrack.enabled === true) {
-      this.audioOff = false;
-    } else {
-      this.audioOff = true;
-    }
-
   }
 }
 </script>
