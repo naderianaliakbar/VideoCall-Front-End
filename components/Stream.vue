@@ -41,7 +41,7 @@ export default {
   props  : ['srcObject', 'isMainStream'],
   mounted() {
     this.$refs.videoObject.srcObject = this.srcObject;
-    if (this.srcObject.user._id === this.$auth.user.id) {
+    if ((this.srcObject.user._id === this.$auth.user.id) || this.srcObject.user.id === this.$auth.user.id) {
       this.$refs.videoObject.muted = true;
       this.streamName              = 'Me';
     } else {
@@ -62,6 +62,7 @@ export default {
   min-height: 100% !important;
   max-width: 100% !important;
   max-height: 100% !important;
+  border: white 1px solid;
 }
 
 .videoObject {

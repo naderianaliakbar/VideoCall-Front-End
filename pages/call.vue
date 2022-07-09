@@ -14,20 +14,34 @@
     <v-sheet color="white" class="gridVideos mt-5" v-if="!loading">
       <v-row>
         <v-col class="mainStream pa-0" cols="12" sm="12" md="9" lg="9" xl="9">
-          <Stream v-if="renderStreams"
+          <Stream v-if="renderMainStream"
                   :isMainStream="true"
                   :srcObject="getStream(mainStream)"/>
         </v-col>
         <v-col class="listOfStreams px-0 mx-0 pa-0" cols="12" sm="12" md="3" lg="3" xl="3">
           <v-list width="100%" height="100%" class="mx-0">
-            <v-list-item v-for="(stream,index) in streams"
-                         :key="index"
-                         class="streamItem pt-1 pb-1"
-                         v-if="stream != null && renderStreams">
+
+            <!--      Local Stream      -->
+            <v-list-item class="streamItem pt-1 pb-1" v-if="streams.localUserMediaStream && renderLocalStream">
               <Stream @selectAsMainStream="selectAsMainStream"
                       :isMainStream="false"
-                      :srcObject="getStream(stream.name)"/>
+                      :srcObject="streams.localUserMediaStream"/>
             </v-list-item>
+
+            <!--      ScreenShare Stream      -->
+            <v-list-item class="streamItem pt-1 pb-1" v-if="streams.localScreenShareStream && renderScreenShareStream">
+              <Stream @selectAsMainStream="selectAsMainStream"
+                      :isMainStream="false"
+                      :srcObject="streams.localScreenShareStream"/>
+            </v-list-item>
+
+            <!--      Remote Stream      -->
+            <v-list-item class="streamItem pt-1 pb-1" v-if="streams.remoteUserMediaStream && renderRemoteStream">
+              <Stream @selectAsMainStream="selectAsMainStream"
+                      :isMainStream="false"
+                      :srcObject="streams.remoteUserMediaStream"/>
+            </v-list-item>
+
           </v-list>
         </v-col>
       </v-row>
@@ -43,30 +57,31 @@ export default {
   auth    : true,
   data    : () => {
     return {
-      status              : -1,
-      loading             : true,
-      loadingText         : '',
-      roomInfo            : {},
-      socket              : '',
-      creator             : false,
-      peerUser            : '',
-      myPeerId            : '',
-      connection          : null,
-      microphone          : false,
-      microphoneLoader    : false,
-      camera              : false,
-      cameraLoader        : false,
-      screenShare         : false,
-      screenShareLoader   : false,
-      deviceWidth         : 0,
-      deviceHeight        : 0,
-      mainStream          : 'local',
-      streams             : {
+      status                 : -1,
+      loading                : true,
+      loadingText            : '',
+      roomInfo               : {},
+      socket                 : '',
+      creator                : false,
+      peerUser               : '',
+      myPeerId               : '',
+      connection             : null,
+      candidateReceiveSet    : false,
+      microphone             : false,
+      microphoneLoader       : false,
+      camera                 : false,
+      cameraLoader           : false,
+      screenShare            : false,
+      screenShareLoader      : false,
+      deviceWidth            : 0,
+      deviceHeight           : 0,
+      mainStream             : 'local',
+      streams                : {
         localUserMediaStream  : null,
         localScreenShareStream: null,
         remoteUserMediaStream : null,
       },
-      streamsTracks       : {
+      streamsTracks          : {
         localTracks: {
           userMediaTracks  : {
             microphone: null,
@@ -78,8 +93,11 @@ export default {
           },
         },
       },
-      renderStreams       : false,
-      peerConnectionConfig: {
+      renderLocalStream      : false,
+      renderScreenShareStream: false,
+      renderRemoteStream     : false,
+      renderMainStream       : false,
+      peerConnectionConfig   : {
         // iceTransportPolicy: 'relay',
         // iceServers        : [
         //   {
@@ -185,7 +203,10 @@ export default {
       });
     }
 
-    // create call
+    // Creating peerConnection
+    this.connection = new RTCPeerConnection();
+
+    // Create call
     this.socket.on('callAccepted', () => {
       this.loadingText = this.$t(`CONNECTING`);
       this.getUserMediaAccess(() => {
@@ -209,6 +230,15 @@ export default {
             this.connection.createAnswer().then((answer) => {
               this.connection.setLocalDescription(answer);
               this.socket.emit('answer', username, answer);
+
+              // Add Candidate Event
+              if (!this.candidateReceiveSet) {
+                this.connection.onicecandidate = ({candidate}) => {
+                  candidate && this.socket.emit('candidate', this.peerUser, candidate);
+                };
+                this.candidateReceiveSet       = true;
+              }
+
             });
           });
         });
@@ -272,10 +302,6 @@ export default {
           if (audioTrack) {
             audioTrack.enabled = false;
           }
-        }
-
-        if (audioTrack || videoTrack) {
-          this.reRenderStreams();
         }
       }
     });
@@ -437,18 +463,33 @@ export default {
           return this.streams.localScreenShareStream;
       }
     },
-    getStreamName(stream) {
-      if (stream.user._id === this.userId) {
-        return 'Me';
-      } else {
-        return stream.user.firstName;
+    reRenderStreams(type = 'local') {
+      switch (type) {
+        case 'local' :
+          this.renderLocalStream = false;
+          this.$nextTick(() => {
+            this.renderLocalStream = true;
+          });
+          break;
+        case 'screenShare' :
+          this.renderScreenShareStream = false;
+          this.$nextTick(() => {
+            this.renderScreenShareStream = true;
+          });
+          break;
+        case 'remote' :
+          this.renderRemoteStream = false;
+          this.$nextTick(() => {
+            this.renderRemoteStream = true;
+          });
+          break;
+        case 'main' :
+          this.renderMainStream = false;
+          this.$nextTick(() => {
+            this.renderMainStream = true;
+          });
+          break;
       }
-    },
-    reRenderStreams() {
-      this.renderStreams = false;
-      this.$nextTick(() => {
-        this.renderStreams = true;
-      });
     },
     getUserMediaAccess(callback) {
 
@@ -524,6 +565,7 @@ export default {
       localUserMediaStream.user         = this.$auth.user;
       localUserMediaStream.name         = 'local';
       this.streams.localUserMediaStream = localUserMediaStream;
+      this.reRenderStreams('local');
       if (callback && typeof callback === 'function') {
         callback();
       }
@@ -543,51 +585,26 @@ export default {
       localScreenShareStream.name         = 'localScreenShare';
       localScreenShareStream.user         = this.$auth.user;
       this.streams.localScreenShareStream = localScreenShareStream;
+      this.reRenderStreams('screenShare');
     },
     selectAsMainStream(streamObject) {
       this.mainStream = streamObject.name;
     },
     createConnection(callback) {
 
-      // creating peerConnection
-      this.connection = new RTCPeerConnection();
-
-      if (this.streamsTracks.localTracks.userMediaTracks.microphone != null) {
-        // add microphone track to connection
-        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.microphone);
-      }
-      if (this.streamsTracks.localTracks.userMediaTracks.camera != null) {
-        // add camera track to connection
-        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.camera);
-      }
-
-      // add candidate event
-      this.connection.onicecandidate = ({candidate}) => {
-        candidate && this.socket.emit('candidate', this.peerUser, candidate);
-      };
-
-      // get remote stream
-      this.connection.ontrack = (rtcTrack) => {
-        // create remote media stream
-        if (this.streams.remoteUserMediaStream === null) {
-          this.streams.remoteUserMediaStream      = new MediaStream();
-          this.streams.remoteUserMediaStream.name = 'remote';
-          this.streams.remoteUserMediaStream.user = this.roomInfo.user;
-          this.mainStream                         = 'remote';
-        }
-        // add track
-        this.streams.remoteUserMediaStream.addTrack(rtcTrack.track);
-
-        if (this.loading) {
-          this.loading = false;
-        }
-        this.reRenderStreams();
-      };
-
       // Receive Answer to establish peer connection
       this.socket.on('answer', (username, description) => {
         if (this.peerUser === username) {
           this.connection.setRemoteDescription(description);
+
+          // Add Candidate Event
+          if (!this.candidateReceiveSet) {
+            this.connection.onicecandidate = ({candidate}) => {
+              candidate && this.socket.emit('candidate', this.peerUser, candidate);
+            };
+            this.candidateReceiveSet       = true;
+          }
+
         }
       });
 
@@ -596,10 +613,37 @@ export default {
         if (this.peerUser === username) {
           if (candidate.candidate != null && candidate.sdpMid != null && candidate.sdpMLineIndex != null) {
             this.connection.addIceCandidate(new RTCIceCandidate(candidate));
-            console.log('ice candidate added');
           }
         }
       });
+
+      if (this.streamsTracks.localTracks.userMediaTracks.microphone != null) {
+        // add microphone track to connection
+        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.microphone);
+      }
+
+      if (this.streamsTracks.localTracks.userMediaTracks.camera != null) {
+        // add camera track to connection
+        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.camera);
+      }
+
+      // get remote stream
+      this.connection.ontrack = (rtcTrack) => {
+        // create remote media stream
+        if (this.streams.remoteUserMediaStream === null) {
+          this.streams.remoteUserMediaStream      = new MediaStream();
+          this.streams.remoteUserMediaStream.name = 'remote';
+          this.streams.remoteUserMediaStream.user = this.roomInfo.user;
+          this.reRenderStreams('remote');
+          this.mainStream = 'remote';
+        }
+        // add track
+        this.streams.remoteUserMediaStream.addTrack(rtcTrack.track);
+
+        if (this.loading) {
+          this.loading = false;
+        }
+      };
 
       if (callback && typeof callback === 'function') {
         callback();
@@ -607,11 +651,8 @@ export default {
     }
   },
   watch  : {
-    streams() {
-      this.reRenderStreams();
-    },
     mainStream() {
-      this.reRenderStreams();
+      this.reRenderStreams('main');
     },
     remoteStream(val) {
       val.user                           = this.roomInfo.user;
@@ -621,7 +662,6 @@ export default {
     },
     camera() {
       if (this.peerUser) {
-        this.reRenderStreams();
         this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
           video: this.camera || this.screenShare,
           audio: this.microphone || this.screenShare
@@ -630,7 +670,6 @@ export default {
     },
     microphone() {
       if (this.peerUser) {
-        this.reRenderStreams();
         this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
           video: this.camera || this.screenShare,
           audio: this.microphone || this.screenShare
@@ -639,7 +678,6 @@ export default {
     },
     screenShare() {
       if (this.peerUser) {
-        this.reRenderStreams();
         this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
           video: this.camera || this.screenShare,
           audio: this.microphone || this.screenShare
