@@ -30,6 +30,7 @@ export default {
     '~/plugins/notifier.js',
     '~/plugins/global.js',
     '~/plugins/websocket.js',
+    '~/plugins/peer.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -50,11 +51,11 @@ export default {
     localStorage: false,
     resetOnError: true,
     strategies  : {
-      local : {
+      local: {
         token    : {
-          property  : 'token',
-          global    : true,
-          maxAge    : 60 * 60 * 24 * 7
+          property: 'token',
+          global  : true,
+          maxAge  : 60 * 60 * 24 * 7
         },
         user     : {
           property : 'user',
@@ -131,7 +132,9 @@ export default {
   },
 
   publicRuntimeConfig: {
-    SOCKET_URL: process.env.SOCKET_URL
+    SOCKET_URL: process.env.SOCKET_URL,
+    PEER_URL  : process.env.PEER_URL,
+    PEER_PORT : process.env.PEER_PORT
   },
 
   server: {

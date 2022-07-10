@@ -66,7 +66,7 @@ export default {
       peerUser               : '',
       myPeerId               : '',
       connection             : null,
-      candidateReceiveSet    : false,
+      peerConnection         : null,
       microphone             : false,
       microphoneLoader       : false,
       camera                 : false,
@@ -97,16 +97,6 @@ export default {
       renderScreenShareStream: false,
       renderRemoteStream     : false,
       renderMainStream       : false,
-      peerConnectionConfig   : {
-        // iceTransportPolicy: 'relay',
-        // iceServers        : [
-        //   {
-        //     urls      : 'turn:turn.exoroya.ir',
-        //     credential: '123',
-        //     username  : 'abc'
-        //   },
-        // ]
-      }
     };
   },
   computed: {
@@ -146,9 +136,11 @@ export default {
   },
   mounted() {
     // set socket object
-    this.socket = this.$websocket.getSocket();
+    this.socket         = this.$websocket.getSocket();
+    this.peerConnection = this.$peer.getPeer();
 
     if (!this.roomId) {
+      this.destroyStreams();
       // redirect to contact page
       this.$router.push({
         path: "/contacts"
@@ -164,6 +156,7 @@ export default {
 
         // call is ended
         if (this.roomInfo.status !== 0 && !(this.roomInfo.status === 1 && !this.creator)) {
+          this.destroyStreams();
           // redirect to contact page
           this.$router.push({
             path: "/contacts"
@@ -177,7 +170,7 @@ export default {
           this.loadingText = this.$t(`PREPARING_CALL`);
         } else {
           // accept call
-          this.socket.emit('acceptCall', this.peerUser, this.roomInfo._id, this.myPeerId);
+          this.socket.emit('acceptCall', this.peerUser, this.roomInfo._id, this.$peer.getPeerId());
         }
 
 
@@ -189,6 +182,7 @@ export default {
                 content: this.$t(`PERMISSION_DENIED`),
                 color  : 'error'
               });
+              this.destroyStreams();
               this.$router.push({
                 path: "/contacts"
               })
@@ -203,50 +197,54 @@ export default {
       });
     }
 
-    // Creating peerConnection
-    this.connection = new RTCPeerConnection();
-
     // Create call
-    this.socket.on('callAccepted', () => {
+    this.socket.on('callAccepted', (peerId) => {
       this.loadingText = this.$t(`CONNECTING`);
       this.getUserMediaAccess(() => {
-        this.createConnection(() => {
-          // Create Offer, setLocalDescription
-          this.connection.createOffer().then((offer) => {
-            this.connection.setLocalDescription(offer);
-            this.socket.emit('offer', this.peerUser, offer);
+        let call        = this.peerConnection.call(peerId, this.streams.localUserMediaStream);
+        this.connection = call.peerConnection;
+        this.loading    = false;
+        call.on('stream', (remoteStream) => {
+          remoteStream.name                  = 'remote';
+          remoteStream.user                  = this.roomInfo.user;
+          this.streams.remoteUserMediaStream = remoteStream;
+          this.reRenderStreams('remote');
+          this.mainStream = 'remote';
+          this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
+            video: this.camera || this.screenShare,
+            audio: this.microphone || this.screenShare
           });
         });
       });
     });
 
-    // receive call
-    this.socket.on('offer', (username, offerDescription) => {
-      if (this.peerUser === username) {
-        this.getUserMediaAccess(() => {
-          this.createConnection(() => {
-            // setRemoteDescription and answer the offer
-            this.connection.setRemoteDescription(offerDescription);
-            this.connection.createAnswer().then((answer) => {
-              this.connection.setLocalDescription(answer);
-              this.socket.emit('answer', username, answer);
-
-              // Add Candidate Event
-              if (!this.candidateReceiveSet) {
-                this.connection.onicecandidate = ({candidate}) => {
-                  candidate && this.socket.emit('candidate', this.peerUser, candidate);
-                };
-                this.candidateReceiveSet       = true;
-              }
-
+    // Receive Call
+    this.peerConnection.on('call', (call) => {
+      this.getUserMediaAccess(() => {
+        this.loadingText = this.$t(`CONNECTING`);
+        call.answer(this.streams.localUserMediaStream);
+        this.connection = call.peerConnection;
+        this.loading    = false;
+        call.on('stream', (remoteStream) => {
+          remoteStream.name                  = 'remote';
+          remoteStream.user                  = this.roomInfo.user;
+          this.streams.remoteUserMediaStream = remoteStream;
+          this.reRenderStreams('remote');
+          this.mainStream = 'remote';
+          setTimeout(() => {
+            this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
+              video: this.camera || this.screenShare,
+              audio: this.microphone || this.screenShare
             });
-          });
+          }, 1500);
         });
-      }
+      });
     });
+
 
     this.socket.on('callRejected', () => {
       this.loadingText = this.$t(`CALL_REJECTED`);
+      this.destroyStreams();
       setTimeout(() => {
         // redirect to contact page
         this.$router.push({
@@ -261,6 +259,7 @@ export default {
       } else {
         if (response.message === 'offline') {
           this.loadingText = this.$t(`USER_IS_OFFLINE`);
+          this.destroyStreams();
           setTimeout(() => {
             // redirect to contact page
             this.$router.push({
@@ -269,6 +268,7 @@ export default {
           }, 3000);
         } else if (response.message === 'user is busy') {
           this.loadingText = 'the user is busy';
+          this.destroyStreams();
           setTimeout(() => {
             // redirect to contact page
             this.$router.push({
@@ -309,6 +309,7 @@ export default {
     this.socket.on('endCall', () => {
       this.loading     = true;
       this.loadingText = this.$t(`CALL_ENDED`);
+      this.destroyStreams();
       setTimeout(() => {
         // redirect to contact page
         this.$router.push({
@@ -446,6 +447,7 @@ export default {
       this.socket.emit('endCall', this.peerUser);
       this.loading     = true;
       this.loadingText = this.$t(`CALL_ENDED`);
+      this.destroyStreams();
       setTimeout(() => {
         // redirect to contact page
         this.$router.push({
@@ -590,64 +592,24 @@ export default {
     selectAsMainStream(streamObject) {
       this.mainStream = streamObject.name;
     },
-    createConnection(callback) {
+    destroyStreams() {
 
-      // Receive Answer to establish peer connection
-      this.socket.on('answer', (username, description) => {
-        if (this.peerUser === username) {
-          this.connection.setRemoteDescription(description);
-
-          // Add Candidate Event
-          if (!this.candidateReceiveSet) {
-            this.connection.onicecandidate = ({candidate}) => {
-              candidate && this.socket.emit('candidate', this.peerUser, candidate);
-            };
-            this.candidateReceiveSet       = true;
-          }
-
-        }
-      });
-
-      // Receive candidates and add to peer connection
-      this.socket.on('candidate', (username, candidate) => {
-        if (this.peerUser === username) {
-          if (candidate.candidate != null && candidate.sdpMid != null && candidate.sdpMLineIndex != null) {
-            this.connection.addIceCandidate(new RTCIceCandidate(candidate));
-          }
-        }
-      });
-
-      if (this.streamsTracks.localTracks.userMediaTracks.microphone != null) {
-        // add microphone track to connection
-        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.microphone);
+      // destroy userMediaStream
+      if (this.streamsTracks.localTracks.userMediaTracks.camera) {
+        this.streamsTracks.localTracks.userMediaTracks.camera.stop();
+      }
+      if (this.streamsTracks.localTracks.userMediaTracks.microphone) {
+        this.streamsTracks.localTracks.userMediaTracks.microphone.stop();
       }
 
-      if (this.streamsTracks.localTracks.userMediaTracks.camera != null) {
-        // add camera track to connection
-        this.connection.addTrack(this.streamsTracks.localTracks.userMediaTracks.camera);
+      // destroy screenShareStream
+      if (this.streamsTracks.localTracks.screenShareTracks.screenShareVideo) {
+        this.streamsTracks.localTracks.screenShareTracks.screenShareVideo.stop();
+      }
+      if (this.streamsTracks.localTracks.screenShareTracks.screenShareAudio) {
+        this.streamsTracks.localTracks.screenShareTracks.screenShareAudio.stop();
       }
 
-      // get remote stream
-      this.connection.ontrack = (rtcTrack) => {
-        // create remote media stream
-        if (this.streams.remoteUserMediaStream === null) {
-          this.streams.remoteUserMediaStream      = new MediaStream();
-          this.streams.remoteUserMediaStream.name = 'remote';
-          this.streams.remoteUserMediaStream.user = this.roomInfo.user;
-          this.reRenderStreams('remote');
-          this.mainStream = 'remote';
-        }
-        // add track
-        this.streams.remoteUserMediaStream.addTrack(rtcTrack.track);
-
-        if (this.loading) {
-          this.loading = false;
-        }
-      };
-
-      if (callback && typeof callback === 'function') {
-        callback();
-      }
     }
   },
   watch  : {

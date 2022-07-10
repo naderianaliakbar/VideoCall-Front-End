@@ -217,10 +217,14 @@ export default {
       if (val) {
         this.$websocket.createConnection();
         this.setActiveReceiveCalls();
+        this.$peer.connect();
       } else {
         // check if is connected destroy connection
         if (this.$websocket.getSocket() !== undefined) {
           this.$websocket.destroyConnection();
+        }
+        if (this.$peer.getPeer() !== undefined) {
+          this.$peer.destroy();
         }
       }
     },
@@ -305,10 +309,15 @@ export default {
     if (this.loggedIn) {
       this.$websocket.createConnection();
       this.setActiveReceiveCalls();
+      this.$peer.connect();
     } else {
       // check if is connected destroy connection
       if (this.$websocket.getSocket() !== undefined) {
         this.$websocket.destroyConnection();
+      }
+
+      if (this.$peer.getPeer() !== undefined) {
+        this.$peer.destroy();
       }
     }
 
