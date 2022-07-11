@@ -83,8 +83,12 @@ export default {
           email   : this.email,
           password: this.password
         }
-      }).then(response => {
+      }).then(async response => {
         this.loading = false;
+
+        // Set user token
+        await this.$auth.setUserToken(response.data.token);
+
         // set notifier
         this.$notifier.showMessage({
           content: this.$t(`LOGIN_SUCCESSFUL`),
@@ -93,7 +97,7 @@ export default {
 
 
         // redirect to dashboard
-        this.$router.push({
+        await this.$router.push({
           path: "/dashboard"
         })
       }).catch(({response}) => {

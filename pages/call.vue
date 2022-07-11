@@ -10,6 +10,38 @@
       </v-row>
     </v-overlay>
 
+    <div class="toggles" :style="(directionOfLanguage === 'rtl' ? 'left' : 'right') + ':10px'">
+      <v-btn
+        v-if="!isMobile && roomInfo.type === 1"
+        :loading="screenShareLoader"
+        :outlined="screenShare"
+        @click="toggleScreenShare"
+        large
+        icon>
+        <v-icon v-if="screenShare">mdi-projector-screen-outline</v-icon>
+        <v-icon v-else>mdi-projector-screen-off-outline</v-icon>
+      </v-btn>
+      <v-btn
+        v-if="roomInfo.type === 1"
+        :outlined="camera"
+        :loading="cameraLoader"
+        @click="toggleCamera"
+        large
+        icon>
+        <v-icon v-if="camera">mdi-camera-outline</v-icon>
+        <v-icon v-else>mdi-camera-off-outline</v-icon>
+      </v-btn>
+      <v-btn
+        :outlined="microphone"
+        :loading="microphoneLoader"
+        @click="toggleMicrophone"
+        large
+        icon>
+        <v-icon v-if="microphone">mdi-microphone</v-icon>
+        <v-icon v-else>mdi-microphone-off</v-icon>
+      </v-btn>
+    </div>
+
     <!--    Call Page    -->
     <v-sheet color="white" class="gridVideos mt-5" v-if="!loading">
       <v-row>
@@ -100,6 +132,9 @@ export default {
     };
   },
   computed: {
+    directionOfLanguage() {
+      return this.$nuxt.$i18n.localeProperties.dir;
+    },
     roomId() {
       return this.$store.state.user.roomId;
     },
@@ -357,7 +392,6 @@ export default {
       if (!this.screenShare) {
         let videoOptions = {
           aspectRatio: 1.777777778,
-          frameRate  : 60,
           cursor     : "always"
         };
 
@@ -431,12 +465,12 @@ export default {
           console.log(err);
         });
       } else {
+        if (this.mainStream === 'localScreenShare') {
+          this.mainStream = 'remote';
+        }
         this.streamsTracks.localTracks.screenShareTracks.screenShareVideo.stop();
         if (this.streamsTracks.localTracks.screenShareTracks.screenShareAudio) {
           this.streamsTracks.localTracks.screenShareTracks.screenShareAudio.stop();
-        }
-        if (this.mainStream === 'localScreenShare') {
-          this.mainStream = 'remote';
         }
         this.streams.localScreenShareStream = null;
         this.screenShare                    = false;
@@ -672,6 +706,12 @@ export default {
 
 .gridVideos .listOfStreams {
   width: 100%;
+}
+
+.toggles {
+  position: absolute !important;
+  margin-top: -70px;
+  z-index: 1;
 }
 
 @media screen and (max-width: 959px) {

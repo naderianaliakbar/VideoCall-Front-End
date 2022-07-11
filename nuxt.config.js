@@ -48,23 +48,26 @@ export default {
   ],
   // auth
   auth: {
-    localStorage: false,
-    resetOnError: true,
-    strategies  : {
+    strategies: {
       local: {
-        token    : {
+        token       : {
           property: 'token',
-          global  : true,
-          maxAge  : 60 * 60 * 24 * 7
+          global  : true
         },
-        user     : {
+        refreshToken: {
+          property: 'refreshToken',
+          data    : 'refreshToken',
+          maxAge  : 60 * 60 * 24 * 30
+        },
+        user        : {
           property : 'user',
           autoFetch: true
         },
-        endpoints: {
-          login : {url: 'auth/login', method: 'post'},
-          user  : {url: 'auth/me'},
-          logout: {url: 'auth/logout', method: 'post'}
+        endpoints   : {
+          login  : {url: 'auth/login', method: 'post'},
+          user   : {url: 'auth/me'},
+          refresh: {url: 'auth/refreshToken'},
+          logout : {url: 'auth/logout', method: 'post'}
         }
       }
     }
