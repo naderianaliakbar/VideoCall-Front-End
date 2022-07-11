@@ -209,8 +209,11 @@ export default {
     }
   },
   watch   : {
-    page(val) {
+    page(val, oldval) {
       this.$nuxt.$i18n.setLocale(this.$store.state.user.language);
+      if (oldval === 'call') {
+        location.reload();
+      }
     },
     loggedIn(val) {
       // check for create socket
@@ -492,10 +495,10 @@ export default {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
         let devicesSet = {video: [], audio: []};
         devices.forEach((device) => {
-          if(device.kind === 'audioinput') {
+          if (device.kind === 'audioinput') {
             devicesSet.audio.push(device);
           }
-          if(device.kind === 'videoinput') {
+          if (device.kind === 'videoinput') {
             devicesSet.video.push(device);
           }
         });
