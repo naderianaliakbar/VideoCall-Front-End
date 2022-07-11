@@ -1,5 +1,6 @@
 <template>
   <v-card class="pa-0 cardObject pointerCursor"
+          :class="voiceCall ? 'hideStream' : ''"
           dark
           width="100%"
           height="100%"
@@ -38,7 +39,7 @@ export default {
       }
     }
   },
-  props  : ['srcObject', 'isMainStream'],
+  props  : ['srcObject', 'isMainStream', 'voiceCall'],
   mounted() {
     this.$refs.videoObject.srcObject = this.srcObject;
     if ((this.srcObject.user._id === this.$auth.user.id) || this.srcObject.user.id === this.$auth.user.id) {
@@ -52,6 +53,10 @@ export default {
 </script>
 
 <style scoped>
+
+.hideStream {
+  display: none !important;
+}
 
 .pointerCursor {
   cursor: pointer !important;

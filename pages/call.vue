@@ -1,5 +1,5 @@
 <template>
-  <v-sheet>
+  <div>
     <!--  loading overlay  -->
     <v-overlay :value="loading" opacity="1">
       <v-row class="d-flex justify-center" no-gutters>
@@ -10,40 +10,57 @@
       </v-row>
     </v-overlay>
 
-    <div class="toggles" :style="(directionOfLanguage === 'rtl' ? 'left' : 'right') + ':10px'">
-      <v-btn
-        v-if="!isMobile && roomInfo.type === 1"
-        :loading="screenShareLoader"
-        :outlined="screenShare"
-        @click="toggleScreenShare"
-        large
-        icon>
-        <v-icon v-if="screenShare">mdi-projector-screen-outline</v-icon>
-        <v-icon v-else>mdi-projector-screen-off-outline</v-icon>
-      </v-btn>
-      <v-btn
-        v-if="roomInfo.type === 1"
-        :outlined="camera"
-        :loading="cameraLoader"
-        @click="toggleCamera"
-        large
-        icon>
-        <v-icon v-if="camera">mdi-camera-outline</v-icon>
-        <v-icon v-else>mdi-camera-off-outline</v-icon>
-      </v-btn>
-      <v-btn
-        :outlined="microphone"
-        :loading="microphoneLoader"
-        @click="toggleMicrophone"
-        large
-        icon>
-        <v-icon v-if="microphone">mdi-microphone</v-icon>
-        <v-icon v-else>mdi-microphone-off</v-icon>
-      </v-btn>
-    </div>
+    <!-- Video Call  -->
+    <v-sheet class="gridVideos mt-5" v-if="roomInfo.type === 1 && !loading">
 
-    <!--    Call Page    -->
-    <v-sheet color="white" class="gridVideos mt-5" v-if="!loading">
+      <!--   Toggles   -->
+      <div class="toggles" :style="(directionOfLanguage === 'rtl' ? 'left' : 'right') + ':10px'">
+
+        <!--  End Call    -->
+        <v-btn
+          @click="endCall"
+          color="red"
+          large
+          icon>
+          <v-icon>mdi-phone-remove</v-icon>
+        </v-btn>
+
+        <!--   ScreenShare   -->
+        <v-btn
+          v-if="!isMobile"
+          :loading="screenShareLoader"
+          :outlined="screenShare"
+          @click="toggleScreenShare"
+          large
+          icon>
+          <v-icon v-if="screenShare">mdi-projector-screen-outline</v-icon>
+          <v-icon v-else>mdi-projector-screen-off-outline</v-icon>
+        </v-btn>
+
+        <!--   Camera   -->
+        <v-btn
+          :outlined="camera"
+          :loading="cameraLoader"
+          @click="toggleCamera"
+          large
+          icon>
+          <v-icon v-if="camera">mdi-camera-outline</v-icon>
+          <v-icon v-else>mdi-camera-off-outline</v-icon>
+        </v-btn>
+
+        <!--   Microphone   -->
+        <v-btn
+          :outlined="microphone"
+          :loading="microphoneLoader"
+          @click="toggleMicrophone"
+          large
+          icon>
+          <v-icon v-if="microphone">mdi-microphone</v-icon>
+          <v-icon v-else>mdi-microphone-off</v-icon>
+        </v-btn>
+      </div>
+
+      <!--    Call Page   -->
       <v-row>
         <v-col class="mainStream pa-0" cols="12" sm="12" md="9" lg="9" xl="9">
           <Stream v-if="renderMainStream"
@@ -79,8 +96,51 @@
       </v-row>
     </v-sheet>
 
+    <!--    Voice Call   -->
+    <v-sheet class="pa-5 rounded-lg" min-height="80vh" v-if=" roomInfo.type === 0 && !loading">
+      <!--   Avatar   -->
+      <v-row class="d-flex justify-center mt-5 mb-0">
+        <ContactAvatar :avatar="roomInfo.user.avatar"
+                       :name="roomInfo.user.firstName"
+                       :color="roomInfo.user.color"
+                       :size="180"/>
+      </v-row>
+      <!--   Name   -->
+      <v-row class="d-flex justify-center mt-1">
+        <p class="mt-12 text-h5">{{ roomInfo.user.firstName + ' ' + roomInfo.user.lastName }}</p>
+      </v-row>
+      <!--   Action Buttons   -->
+      <v-row class="d-flex justify-center mt-16">
+        <!--   Microphone   -->
+        <v-btn
+          :outlined="microphone"
+          :loading="microphoneLoader"
+          @click="toggleMicrophone"
+          class="mx-5"
+          x-large
+          icon>
+          <v-icon v-if="microphone">mdi-microphone</v-icon>
+          <v-icon v-else>mdi-microphone-off</v-icon>
+        </v-btn>
 
-  </v-sheet>
+        <!--  End Call    -->
+        <v-btn
+          @click="endCall"
+          color="red"
+          x-large
+          icon>
+          <v-icon>mdi-phone-remove</v-icon>
+        </v-btn>
+
+      </v-row>
+      <Stream v-if="streams.remoteUserMediaStream && renderRemoteStream"
+              @selectAsMainStream="selectAsMainStream"
+              :isMainStream="false"
+              :voiceCall="true"
+              :srcObject="streams.remoteUserMediaStream"/>
+    </v-sheet>
+
+  </div>
 </template>
 
 <script>
@@ -245,10 +305,6 @@ export default {
           this.streams.remoteUserMediaStream = remoteStream;
           this.reRenderStreams('remote');
           this.mainStream = 'remote';
-          this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
-            video: this.camera || this.screenShare,
-            audio: this.microphone || this.screenShare
-          });
         });
       });
     });
@@ -266,12 +322,6 @@ export default {
           this.streams.remoteUserMediaStream = remoteStream;
           this.reRenderStreams('remote');
           this.mainStream = 'remote';
-          setTimeout(() => {
-            this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
-              video: this.camera || this.screenShare,
-              audio: this.microphone || this.screenShare
-            });
-          }, 1500);
         });
       });
     });
@@ -280,12 +330,9 @@ export default {
     this.socket.on('callRejected', () => {
       this.loadingText = this.$t(`CALL_REJECTED`);
       this.destroyStreams();
-      setTimeout(() => {
-        // redirect to contact page
-        this.$router.push({
-          path: "/contacts"
-        })
-      }, 1500);
+
+      // redirect to contact page
+      location.href = '/contacts';
     });
 
     this.socket.on('prepareCall', (response) => {
@@ -295,48 +342,15 @@ export default {
         if (response.message === 'offline') {
           this.loadingText = this.$t(`USER_IS_OFFLINE`);
           this.destroyStreams();
-          setTimeout(() => {
-            // redirect to contact page
-            this.$router.push({
-              path: "/contacts"
-            })
-          }, 3000);
+
+          // redirect to contact page
+          location.href = '/contacts';
         } else if (response.message === 'user is busy') {
           this.loadingText = 'the user is busy';
           this.destroyStreams();
-          setTimeout(() => {
-            // redirect to contact page
-            this.$router.push({
-              path: "/contacts"
-            })
-          }, 3000)
-        }
-      }
-    });
 
-    this.socket.on('getRemoteStreamConfigs', (configs) => {
-      if (this.streams.remoteUserMediaStream != null) {
-        let videoTrack = this.streams.remoteUserMediaStream.getTracks().find(streamTrack => streamTrack.kind === 'video');
-        let audioTrack = this.streams.remoteUserMediaStream.getTracks().find(streamTrack => streamTrack.kind === 'audio');
-
-        if (configs.video) {
-          if (videoTrack) {
-            videoTrack.enabled = true;
-          }
-        } else {
-          if (videoTrack) {
-            videoTrack.enabled = false;
-          }
-        }
-
-        if (configs.audio) {
-          if (audioTrack) {
-            audioTrack.enabled = true;
-          }
-        } else {
-          if (audioTrack) {
-            audioTrack.enabled = false;
-          }
+          // redirect to contact page
+          location.href = '/contacts';
         }
       }
     });
@@ -345,12 +359,9 @@ export default {
       this.loading     = true;
       this.loadingText = this.$t(`CALL_ENDED`);
       this.destroyStreams();
-      setTimeout(() => {
-        // redirect to contact page
-        this.$router.push({
-          path: "/contacts"
-        })
-      }, 1500);
+
+      // redirect to contact page
+      location.href = '/contacts';
     });
 
   },
@@ -482,12 +493,9 @@ export default {
       this.loading     = true;
       this.loadingText = this.$t(`CALL_ENDED`);
       this.destroyStreams();
-      setTimeout(() => {
-        // redirect to contact page
-        this.$router.push({
-          path: "/contacts"
-        })
-      }, 1500);
+
+      // redirect to contact page
+      location.href = '/contacts';
     },
     getStream(streamName) {
       switch (streamName) {
@@ -655,30 +663,6 @@ export default {
       val.name                           = 'remote';
       this.streams.remoteUserMediaStream = val;
       this.mainStream                    = 'remote';
-    },
-    camera() {
-      if (this.peerUser) {
-        this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
-          video: this.camera || this.screenShare,
-          audio: this.microphone || this.screenShare
-        });
-      }
-    },
-    microphone() {
-      if (this.peerUser) {
-        this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
-          video: this.camera || this.screenShare,
-          audio: this.microphone || this.screenShare
-        });
-      }
-    },
-    screenShare() {
-      if (this.peerUser) {
-        this.socket.emit('getRemoteStreamConfigs', this.peerUser, {
-          video: this.camera || this.screenShare,
-          audio: this.microphone || this.screenShare
-        });
-      }
     },
   },
 }
