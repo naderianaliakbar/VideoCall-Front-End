@@ -27,5 +27,11 @@ export const mutations = {
   },
   saveMicrophoneAccess(state, accessState) {
     state.microphoneAccess = accessState;
+  },
+  saveNoiseSuppression(state, val) {
+    state.noiseSuppression = val;
+  },
+  saveEchoCancellation(state, val) {
+    state.echoCancellation = val;
   }
 }

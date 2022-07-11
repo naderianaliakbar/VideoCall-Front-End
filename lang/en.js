@@ -69,7 +69,11 @@ let messages = {
   MICROPHONE_REQUEST    : 'To make a call, we need to enable microphone access',
   MEDIA_REQUEST         : 'To make a call, we need to activate the microphone and camera access',
   CLICK_ALLOW           : 'Click Allow in the Activation Request window',
-  ACCESS_PROBLEM        : 'There is an access problem. Please enable it from settings'
+  ACCESS_PROBLEM        : 'There is an access problem. Please enable it from settings',
+  SETTING_REQUEST       : 'To apply the settings, we need to enable microphone and camera access',
+  GET_ACCESS            : 'Get Access',
+  CAMERA                : 'Camera',
+  MICROPHONE            : 'Microphone',
 };
 
 export default messages;

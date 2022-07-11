@@ -490,7 +490,16 @@ export default {
     },
     getUserDevices() {
       navigator.mediaDevices.enumerateDevices().then((devices) => {
-        this.$store.commit('call/saveUserDevices', devices);
+        let devicesSet = {video: [], audio: []};
+        devices.forEach((device) => {
+          if(device.kind === 'audioinput') {
+            devicesSet.audio.push(device);
+          }
+          if(device.kind === 'videoinput') {
+            devicesSet.video.push(device);
+          }
+        });
+        this.$store.commit('call/saveUserDevices', devicesSet);
       });
     },
     getUserMediaAccess(callback) {

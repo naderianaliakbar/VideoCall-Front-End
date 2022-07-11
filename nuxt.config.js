@@ -52,7 +52,8 @@ export default {
       local: {
         token       : {
           property: 'token',
-          global  : true
+          global  : true,
+          maxAge  : 60 * 60 * 24 * 30
         },
         refreshToken: {
           property: 'refreshToken',
