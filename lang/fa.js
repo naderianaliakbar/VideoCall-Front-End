@@ -28,7 +28,7 @@ let messages = {
   NETWORK_OFF           : 'اتصال اینترنت قطع شده است',
   RECONNECTING          : 'در حال اتصال مجدد',
   CONNECTED             : 'متصل شد',
-  STATISTICS            : 'آمار و اطلاعات',
+  RECENT_CALLS          : 'تماس‌های اخیر',
   ALL_CALLS             : 'تمامی تماس‌ها',
   CALLS_MADE            : 'تماس‌های گرفته شده',
   CALLS_RECEIVED        : 'تماس‌های دریافتی',
@@ -73,6 +73,7 @@ let messages = {
   GET_ACCESS            : 'گرفتن دسترسی',
   CAMERA                : 'دوربین',
   MICROPHONE            : 'میکروفن',
+  NO_CALLS              : 'شما تا به حال تماسی نداشتید',
 };
 
 export default messages;

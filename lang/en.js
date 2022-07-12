@@ -29,7 +29,7 @@ let messages = {
   NETWORK_OFF           : 'Internet connection disconnected',
   RECONNECTING          : 'Reconnecting',
   CONNECTED             : 'Connected',
-  STATISTICS            : 'Statistics',
+  RECENT_CALLS          : 'Recent Calls',
   ALL_CALLS             : 'All Cals',
   CALLS_MADE            : 'Calls made',
   CALLS_RECEIVED        : 'Calls received',
@@ -74,6 +74,7 @@ let messages = {
   GET_ACCESS            : 'Get Access',
   CAMERA                : 'Camera',
   MICROPHONE            : 'Microphone',
+  NO_CALLS              : 'You have not been contacted yet',
 };
 
 export default messages;

@@ -150,138 +150,42 @@
 
     <v-divider class="my-6"></v-divider>
 
-    <h2>{{ $t(`STATISTICS`) }}</h2>
-    <!--   Statistics Loading   -->
-    <v-row class="mt-2" v-if="statisticsLoading">
-      <!--    All Calls      -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-5" type="avatar"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-9" min-width="150px" type="text"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-13 mb-7" min-width="50px" type="text"></v-skeleton-loader>
-          </v-row>
-        </v-alert>
-      </v-col>
-      <!--    Calls  made     -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-5" type="avatar"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-9" min-width="120px" type="text"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-13 mb-7" min-width="50px" type="text"></v-skeleton-loader>
-          </v-row>
-        </v-alert>
-      </v-col>
-      <!--    Calls received      -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-5" type="avatar"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-9" min-width="120px" type="text"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-13 mb-7" min-width="50px" type="text"></v-skeleton-loader>
-          </v-row>
-        </v-alert>
-      </v-col>
-      <!--    Total time of calls      -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-5" type="avatar"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-9" min-width="120px" type="text"></v-skeleton-loader>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <v-skeleton-loader class="mt-13 mb-7" min-width="50px" type="text"></v-skeleton-loader>
-          </v-row>
-        </v-alert>
-      </v-col>
-    </v-row>
+    <h2>{{ $t(`RECENT_CALLS`) }}</h2>
 
-    <!--   Statistics cards   -->
-    <v-row class="mt-2" v-if="!statisticsLoading">
-      <!--    All Calls      -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-avatar class="mt-8">
-              <v-icon size="40" :class="directionOfLanguage === 'rtl' ? 'ml-n4' : 'mr-n3'"
-                      color="green">
-                mdi-call-made
-              </v-icon>
-              <v-icon size="40" color="red">mdi-call-received</v-icon>
-            </v-avatar>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-3">{{ $t(`ALL_CALLS`) }}</h5>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-6">50</h5>
-          </v-row>
-        </v-alert>
-      </v-col>
-      <!--    Calls  made     -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-avatar class="mt-8">
-              <v-icon size="50" color="green">mdi-call-made</v-icon>
-            </v-avatar>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-3">{{ $t(`CALLS_MADE`) }}</h5>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-6">152</h5>
-          </v-row>
-        </v-alert>
-      </v-col>
-      <!--    Calls received      -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-avatar class="mt-8">
-              <v-icon size="50" color="red">mdi-call-received</v-icon>
-            </v-avatar>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-3">{{ $t(`CALLS_RECEIVED`) }}</h5>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-6">50</h5>
-          </v-row>
-        </v-alert>
-      </v-col>
-      <!--    Total time of calls      -->
-      <v-col cols="6" md="3">
-        <v-alert outlined>
-          <v-row class="d-flex justify-center">
-            <v-avatar class="mt-8">
-              <v-icon size="50">mdi-clock</v-icon>
-            </v-avatar>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-3">{{ $t(`TOTAL_TIME_OF_CALLS`) }}</h5>
-          </v-row>
-          <v-row class="d-flex justify-center">
-            <h5 class="d-block mt-5 mb-6">50:15</h5>
-          </v-row>
-        </v-alert>
-      </v-col>
-    </v-row>
+    <!--  Mobile  List Skeleton  -->
+    <v-skeleton-loader v-if="callsLoading"
+                       v-for="index in 5"
+                       :key="index"
+                       class="mt-3 mx-n3"
+                       type="list-item-avatar-two-line">
+    </v-skeleton-loader>
+
+    <!--  Calls  List   -->
+    <v-list v-if="!callsLoading" class="mt-3 mx-n3 mb-10" nav>
+      <v-list-item v-for="call in callsList" :key="call._id">
+        <v-icon v-if="call.creator" color="green" class="mx-1">mdi-call-made</v-icon>
+        <v-icon v-else color="blue" class="mx-1">mdi-call-received</v-icon>
+        <v-list-item-avatar class="mx-2 mx-md-4">
+          <ContactAvatar :avatar="call.user.avatar"
+                         :name="call.user.firstName"
+                         :color="call.user.color"/>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title>{{ call.user.firstName + ' ' + call.user.lastName }}</v-list-item-title>
+        </v-list-item-content>
+        <v-list-item-icon>
+          <h4 v-text="directionOfLanguage === 'rtl' ? call.startDateJalali : call.startDate"></h4>
+        </v-list-item-icon>
+      </v-list-item>
+    </v-list>
+
+    <!--  No Calls  -->
+    <div v-if="!callsLoading && !callsList.length">
+      <v-row class="d-flex justify-center">
+        <h3 class="my-16">{{ $t(`NO_CALLS`) }}</h3>
+      </v-row>
+    </div>
+
 
   </v-sheet>
 </template>
@@ -299,7 +203,7 @@ export default {
   },
   data      : () => {
     return {
-      statisticsLoading : false,
+      callsLoading      : false,
       profileEditMode   : false,
       editForm          : {
         firstName: '',
@@ -307,6 +211,7 @@ export default {
         email    : '',
         color    : ''
       },
+      callsList         : [],
       colorPickerDialog : false,
       logoutDialog      : false,
       editProfileLoading: false,
@@ -317,6 +222,8 @@ export default {
     this.editForm.lastName  = this.$auth.user.lastName;
     this.editForm.email     = this.$auth.user.email;
     this.editForm.color     = this.$auth.user.color;
+
+    this.getCalls();
   },
   computed: {
     directionOfLanguage() {
@@ -350,6 +257,13 @@ export default {
         }
       }).finally(() => {
         this.editProfileLoading = false;
+      });
+    },
+    async getCalls() {
+      this.callsLoading = true;
+      this.$axios.get('calls').then(async response => {
+        this.callsList    = response.data.calls;
+        this.callsLoading = false;
       });
     },
     setColor(color) {

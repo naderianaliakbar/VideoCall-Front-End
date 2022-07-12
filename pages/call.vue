@@ -5,9 +5,7 @@
       <v-row class="d-flex justify-center" no-gutters>
         <h1>{{ loadingText }}</h1>
       </v-row>
-      <v-row class="d-flex justify-center mt-5" no-gutters>
-        <label style="position: fixed; bottom: 10px" class="overline">EXOROYA</label>
-      </v-row>
+      <label style="position: fixed; bottom: 10px; text-align: center;width: 100%" class="overline">EXOROYA</label>
     </v-overlay>
 
     <!-- Video Call  -->
