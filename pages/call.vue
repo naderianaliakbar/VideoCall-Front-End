@@ -18,7 +18,6 @@
         <v-btn
           @click="endCall"
           color="red"
-          large
           icon>
           <v-icon>mdi-phone-remove</v-icon>
         </v-btn>
@@ -29,7 +28,6 @@
           :loading="screenShareLoader"
           :outlined="screenShare"
           @click="toggleScreenShare"
-          large
           icon>
           <v-icon v-if="screenShare">mdi-projector-screen-outline</v-icon>
           <v-icon v-else>mdi-projector-screen-off-outline</v-icon>
@@ -40,7 +38,6 @@
           :outlined="camera"
           :loading="cameraLoader"
           @click="toggleCamera"
-          large
           icon>
           <v-icon v-if="camera">mdi-camera-outline</v-icon>
           <v-icon v-else>mdi-camera-off-outline</v-icon>
@@ -51,7 +48,6 @@
           :outlined="microphone"
           :loading="microphoneLoader"
           @click="toggleMicrophone"
-          large
           icon>
           <v-icon v-if="microphone">mdi-microphone</v-icon>
           <v-icon v-else>mdi-microphone-off</v-icon>
@@ -401,6 +397,7 @@ export default {
       if (!this.screenShare) {
         let videoOptions = {
           aspectRatio: 1.777777778,
+          frameRate  : 10,
           cursor     : "always"
         };
 
