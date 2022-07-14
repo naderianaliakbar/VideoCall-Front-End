@@ -5,6 +5,7 @@ export default (app, inject) => {
   inject("websocket", {
     createConnection() {
       socket = io(app.$config.SOCKET_URL, {
+        secure    : true,
         query     : `token=${app.$auth.strategy.token.get().split(' ')[1]}`,
         transports: ['websocket']
       });
@@ -12,9 +13,9 @@ export default (app, inject) => {
       socket.on('userConnect', (message) => {
         if (!message.status) {
           socket.destroy();
-          app.store.commit('system/setSocketConnectError',true);
+          app.store.commit('system/setSocketConnectError', true);
         } else {
-          app.store.commit('system/setSocketConnectError',false);
+          app.store.commit('system/setSocketConnectError', false);
         }
       });
     },

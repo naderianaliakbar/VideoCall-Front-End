@@ -10,7 +10,7 @@ export default (app, inject) => {
         host  : app.$config.PEER_URL,
         port  : app.$config.PEER_PORT,
         token : app.$auth.strategy.token.get().split(' ')[1],
-        secure: false,
+        secure: true,
         // iceTransportPolicy: 'relay',
         // iceServers        : [
         //   {

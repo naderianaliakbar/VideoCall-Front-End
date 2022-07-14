@@ -296,18 +296,6 @@ export default {
     }
   },
   mounted() {
-    window.addEventListener("load", (event) => {
-      this.connected = navigator.onLine;
-    });
-
-    window.addEventListener("offline", (event) => {
-      this.connected = false;
-    });
-
-    window.addEventListener("online", (event) => {
-      this.connected = true;
-    });
-
     // check for create socket
     if (this.loggedIn) {
       this.$websocket.createConnection();

@@ -25,12 +25,12 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '~/plugins/persistedState.client.js',
-    '~/plugins/vee-validate.js',
-    '~/plugins/notifier.js',
-    '~/plugins/global.js',
-    '~/plugins/websocket.js',
-    '~/plugins/peer.js'
+    {src: '~/plugins/persistedState.client.js', mode: 'client'},
+    {src: '~/plugins/vee-validate.js', mode: 'client'},
+    {src: '~/plugins/notifier.js', mode: 'client'},
+    {src: '~/plugins/global.js', mode: 'client'},
+    {src: '~/plugins/websocket.js', mode: 'client'},
+    {src: '~/plugins/peer.js', mode: 'client'},
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -128,7 +128,7 @@ export default {
   },
 
   axios: {
-    baseUrl: process.env.SITE_URL + '/api/v1/',
+    baseUrl: process.env.BASE_API_URL + '/v1/',
   },
 
   env: {
@@ -143,7 +143,7 @@ export default {
 
   server: {
     host: '0.0.0.0',
-    port: 3000
+    port: 443
   }
 
 
