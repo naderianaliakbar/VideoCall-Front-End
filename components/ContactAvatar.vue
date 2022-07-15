@@ -42,6 +42,7 @@
 </template>
 
 <script>
+let mime;
 export default {
   name   : "ContactAvatar",
   props  : ['name', 'color', 'avatar', 'size', 'classes', 'edit'],
@@ -51,7 +52,7 @@ export default {
     };
   },
   mounted() {
-    let mime = this.$global.getMime();
+    mime = this.$global.getMime();
   },
   methods: {
     async uploadAvatar(file) {

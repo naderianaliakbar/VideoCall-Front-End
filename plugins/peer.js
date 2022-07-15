@@ -8,7 +8,6 @@ export default (app, inject) => {
     connect() {
       let peerConnectionConfig = {
         host  : app.$config.PEER_URL,
-        port  : app.$config.PEER_PORT,
         token : app.$auth.strategy.token.get().split(' ')[1],
         secure: true,
         // iceTransportPolicy: 'relay',
