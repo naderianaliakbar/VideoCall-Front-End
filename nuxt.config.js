@@ -30,6 +30,7 @@ export default {
     {src: '~/plugins/notifier.js', mode: 'client'},
     {src: '~/plugins/websocket.js', mode: 'client'},
     {src: '~/plugins/peer.js', mode: 'client'},
+    {src: '~/plugins/global.js', mode: 'client'},
     {src: '~/plugins/detectRTC.js', mode: 'client'},
   ],
 
