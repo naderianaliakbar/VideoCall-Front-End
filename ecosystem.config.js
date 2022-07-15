@@ -1,8 +1,9 @@
 module.exports = {
   apps: [
     {
-      name: 'Exoroya',
-      instances: 'max', // Or a number of instances
+      name: 'exoroya',
+      exec_mode: 'fork',
+      instances: '1',
       script: './node_modules/nuxt/bin/nuxt.js',
       args: 'start'
     }
