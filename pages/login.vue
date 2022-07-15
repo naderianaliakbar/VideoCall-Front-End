@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="pa-5 rounded-lg">
+  <v-sheet class="pa-5 rounded-lg" min-height="80vh">
     <h1>{{ $t(`LOGIN`) }}</h1>
     <v-row>
       <v-col cols="12" md="6" offset-md="3">

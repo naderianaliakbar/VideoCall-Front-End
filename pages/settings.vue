@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="pa-5 rounded-lg" min-height="81vh">
+  <v-sheet class="pa-5 rounded-lg" min-height="80vh">
     <h1>
       {{ $t(`SETTINGS`) }}
     </h1>

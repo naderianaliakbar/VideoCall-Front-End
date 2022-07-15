@@ -1,5 +1,5 @@
 <template>
-  <v-sheet class="pa-5 rounded-lg">
+  <v-sheet class="pa-5 rounded-lg" min-height="80vh">
     <h1>
       {{ $t(`DASHBOARD`) }}
       <!--    Button edit mode    -->

@@ -535,7 +535,6 @@ export default {
       let audioOptions = {
         echoCancellation: this.echoCancellation,
         noiseSuppression: this.noiseSuppression,
-        sampleRate      : 48000
       };
 
       let videoOptions = {};
