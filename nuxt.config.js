@@ -28,9 +28,9 @@ export default {
     {src: '~/plugins/persistedState.client.js', mode: 'client'},
     {src: '~/plugins/vee-validate.js', mode: 'client'},
     {src: '~/plugins/notifier.js', mode: 'client'},
-    {src: '~/plugins/global.js', mode: 'client'},
     {src: '~/plugins/websocket.js', mode: 'client'},
     {src: '~/plugins/peer.js', mode: 'client'},
+    {src: '~/plugins/detectRTC.js', mode: 'client'},
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

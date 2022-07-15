@@ -59,7 +59,6 @@ export default {
 
       // check maximum size for upload
       if (!validExt.includes(mime.getExtension(file.type))) {
-        console.log(mime.getExtension(file.type));
         this.$notifier.showMessage({
           content: this.$t(`INVALID_EXT`),
           color  : 'error'
@@ -82,6 +81,7 @@ export default {
         };
         fileReader.readAsDataURL(file);
       }
+
     },
     async deleteAvatar() {
       let result = await this.$axios.delete('users/me/avatar', {}).then(async response => {

@@ -181,8 +181,6 @@
 <script>
 import {localize} from "vee-validate";
 
-let DetectRTC = require('detectrtc');
-
 export default {
   name: 'DefaultLayout',
   data() {
@@ -313,6 +311,7 @@ export default {
     }
 
     // check UserMediaAccess Permissions
+    let DetectRTC = this.$detectRTC.get();
     this.checkUserMediaPermissions();
 
     // listen to userMediaAccess Request
