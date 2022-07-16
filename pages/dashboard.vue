@@ -212,7 +212,7 @@ import {ValidationProvider, ValidationObserver} from "vee-validate";
 
 export default {
   name      : "dashboard",
-  auth      : false,
+  auth      : true,
   components: {
     ValidationObserver,
     ValidationProvider
