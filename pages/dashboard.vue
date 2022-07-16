@@ -150,7 +150,23 @@
 
     <v-divider class="my-6"></v-divider>
 
-    <h2>{{ $t(`RECENT_CALLS`) }}</h2>
+    <h2>
+      {{ $t(`RECENT_CALLS`) }}
+      <!--   Create Call   -->
+      <v-btn
+        :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
+        to="/contacts"
+        color="primary"
+        elevation="2"
+        rounded
+        large
+        nuxt>
+        <v-icon class="mx-1">mdi-phone-outline</v-icon>
+        <span class="d-none d-md-flex">
+          {{ $t(`CREATE_CALL`) }}
+        </span>
+      </v-btn>
+    </h2>
 
     <!--  Mobile  List Skeleton  -->
     <v-skeleton-loader v-if="callsLoading"
@@ -196,7 +212,7 @@ import {ValidationProvider, ValidationObserver} from "vee-validate";
 
 export default {
   name      : "dashboard",
-  auth      : true,
+  auth      : false,
   components: {
     ValidationObserver,
     ValidationProvider

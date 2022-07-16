@@ -205,7 +205,7 @@
       </v-row>
 
       <v-row class="d-flex justify-center my-7">
-        <v-btn color="primary" @click="addContactDialog = true">
+        <v-btn color="primary" @click="addContactDialog = true" large rounded>
           {{ $t(`ADD_CONTACT`) }}
         </v-btn>
       </v-row>

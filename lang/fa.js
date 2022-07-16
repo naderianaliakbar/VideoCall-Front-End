@@ -74,6 +74,7 @@ let messages = {
   CAMERA                : 'دوربین',
   MICROPHONE            : 'میکروفن',
   NO_CALLS              : 'شما تا به حال تماسی نداشتید',
+  CREATE_CALL           : 'ایجاد تماس',
 };
 
 export default messages;

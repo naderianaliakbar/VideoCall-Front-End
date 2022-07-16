@@ -75,6 +75,7 @@ let messages = {
   CAMERA                : 'Camera',
   MICROPHONE            : 'Microphone',
   NO_CALLS              : 'You have not been contacted yet',
+  CREATE_CALL           : 'Create Call',
 };
 
 export default messages;

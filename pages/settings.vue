@@ -41,7 +41,7 @@
       </v-row>
 
       <v-row class="d-flex justify-center my-7">
-        <v-btn color="primary" @click="getUserMediaAccess">
+        <v-btn color="primary" @click="getUserMediaAccess"  large rounded>
           {{ $t(`GET_ACCESS`) }}
         </v-btn>
       </v-row>
