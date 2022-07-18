@@ -131,7 +131,7 @@ export default {
   },
 
   axios: {
-    baseUrl: process.env.BASE_API_URL + '/v1/',
+    baseUrl: process.env.BASE_API_URL + '/api/v1/',
   },
 
   env: {
@@ -144,10 +144,10 @@ export default {
     PEER_PORT : process.env.PEER_PORT
   },
 
-  server: {
-    host: '0.0.0.0',
-    port: 443
-  }
+  // server: {
+  //   host: '0.0.0.0',
+  //   port: 443
+  // }
 
 
 }
