@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
+const self = 'exoroya.ir'
 
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -18,6 +19,23 @@ export default {
       {rel: 'icon', type: 'image/x-icon', href: '/favicon.png'},
       {rel: 'stylesheet', href: '/IRANSans/css/fontiran.css'}
     ]
+  },
+
+  render: {
+    csp: {
+      reportOnly: false,
+      addMeta: true,     // Add CSP meta-tag in addition to the HTTP header
+      hashAlgorithm: 'sha256',
+      unsafeInlineCompatiblity: true,
+      policies: {
+        'default-src': ["'self'", 'https:'],
+        'script-src': ["'self'", "'strict-dynamic'", 'https:'],
+        'style-src': ["'self'", "'strict-dynamic'", 'https:'],
+        'frame-src': [],
+        'object-src': ["'none'"],
+        'base-uri': ["'self"]
+      }
+    }
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
