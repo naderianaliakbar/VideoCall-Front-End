@@ -27,7 +27,7 @@ export default {
       reportOnly: false,
       addMeta   : false,
       policies  : {
-        'default-src': [self, 'https:'],
+        'default-src': [self, 'https:', 'peer.exoroya.ir'],
         'script-src' : [self, 'https:', 'unsafe-inline', 'strict-dynamic'],
         'style-src'  : [self, 'https:', "'unsafe-inline'"],
         'img-src'    : [self, 'https:', 'data:'],
