@@ -37,6 +37,8 @@ export default {
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
+  target: 'static',
+
   // custom loader
   loading: '~/components/Loading.vue',
 
