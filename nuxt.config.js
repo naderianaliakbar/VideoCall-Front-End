@@ -1,7 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
 
-const self = 'exoroya.ir'
-
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -22,20 +20,6 @@ export default {
     ]
   },
 
-  render: {
-    csp: {
-      reportOnly: false,
-      addMeta   : false,
-      policies  : {
-        'default-src': [self, 'https:', 'peer.exoroya.ir'],
-        'script-src' : [self, 'https:', 'unsafe-inline', 'strict-dynamic'],
-        'style-src'  : [self, 'https:', "'unsafe-inline'"],
-        'img-src'    : [self, 'https:', 'data:'],
-        'object-src' : [self, 'https:', 'self']
-      }
-    }
-  },
-
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],
 
@@ -52,8 +36,6 @@ export default {
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
-
-  target: 'static',
 
   // custom loader
   loading: '~/components/Loading.vue',
@@ -160,10 +142,10 @@ export default {
     PEER_PORT : process.env.PEER_PORT
   },
 
-  // server: {
-  //   host: '0.0.0.0',
-  //   port: 443
-  // }
+  server: {
+    host: '0.0.0.0',
+    port: 443
+  }
 
 
 }
