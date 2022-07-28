@@ -397,7 +397,7 @@ export default {
       if (!this.screenShare) {
         let videoOptions = {
           aspectRatio: 1.777777778,
-          frameRate  : 10,
+          frameRate  : 60,
           cursor     : "always"
         };
 
