@@ -20,10 +20,10 @@
             </validation-provider>
 
             <!--      validation Code      -->
-            <label class="mt-5">
+            <label class="mt-5" v-if="codeSent">
               {{ $t(`VALIDATION_CODE`) }}
             </label>
-            <validation-provider v-if="!codeSent" v-slot="{ errors , valid }" name="validationCode" rules="required">
+            <validation-provider v-if="codeSent" v-slot="{ errors , valid }" name="validationCode" rules="required">
               <v-otp-input v-model="validationCode"
                            length="5"
                            :disabled="loading"
