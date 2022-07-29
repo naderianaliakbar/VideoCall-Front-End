@@ -181,6 +181,46 @@
       <v-list-item v-for="call in callsList" :key="call._id">
         <v-icon v-if="call.creator" color="green" class="mx-1">mdi-call-made</v-icon>
         <v-icon v-else color="blue" class="mx-1">mdi-call-received</v-icon>
+
+        <!--   Offline     -->
+        <v-tooltip v-if="call.status === 6" bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-bind="attrs"
+                    v-on="on"
+                    color="red"
+                    class="mx-n1 mt-1"
+                    small>mdi-phone-off-outline
+            </v-icon>
+          </template>
+          <span>{{ $t(`OFFLINE`) }}</span>
+        </v-tooltip>
+
+        <!--   rejected     -->
+        <v-tooltip v-if="call.status === 3" bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-bind="attrs"
+                    v-on="on"
+                    color="red"
+                    class="mx-n1 mt-1"
+                    small>mdi-phone-hangup-outline
+            </v-icon>
+          </template>
+          <span>{{ $t(`REJECTED`) }}</span>
+        </v-tooltip>
+
+        <!--   busy     -->
+        <v-tooltip v-if="call.status === 4" bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon v-bind="attrs"
+                    v-on="on"
+                    color="red"
+                    class="mx-n1 mt-1"
+                    small>mdi-hand-back-right-off-outline
+            </v-icon>
+          </template>
+          <span>{{ $t(`BUSY`) }}</span>
+        </v-tooltip>
+
         <v-list-item-avatar class="mx-2 mx-md-4">
           <ContactAvatar :avatar="call.user.avatar"
                          :name="call.user.firstName"
