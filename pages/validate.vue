@@ -20,21 +20,25 @@
             </validation-provider>
 
             <!--      validation Code      -->
-            <validation-provider v-if="codeSent" v-slot="{ errors , valid }" name="validationCode" rules="required">
-              <v-text-field v-model="validationCode"
-                            :disabled="loading"
-                            :error-messages="errors"
-                            :color="valid ? 'green' : ''"
-                            :append-icon="valid ? 'mdi-check' : ''"
-                            prepend-inner-icon="mdi-check-decagram-outline"
-                            :label="$t(`VALIDATION_CODE`)">
-              </v-text-field>
+            <label class="mt-5">
+              {{ $t(`VALIDATION_CODE`) }}
+            </label>
+            <validation-provider v-if="!codeSent" v-slot="{ errors , valid }" name="validationCode" rules="required">
+              <v-otp-input v-model="validationCode"
+                           length="5"
+                           :disabled="loading"
+                           :error-messages="errors"
+                           :color="valid ? 'green' : ''"
+                           :append-icon="valid ? 'mdi-check' : ''"
+                           prepend-inner-icon="mdi-check-decagram-outline">
+              </v-otp-input>
             </validation-provider>
 
             <!--     Validate Button       -->
             <v-btn color="primary"
                    type="submit"
-                   class="float-left mt-10 mx-5"
+                   class="mt-10 mx-5"
+                   :class="directionOfLanguage === 'rtl' ? 'float-left' : 'float-right'"
                    :disabled="invalid || (codeSent && !validationCode)"
                    :loading="loading">
               {{ $t(`CONFIRM`) }}
@@ -70,7 +74,11 @@ export default {
   mounted() {
     this.phone = this.$auth.user.phone;
   },
-  computed: {},
+  computed: {
+    directionOfLanguage() {
+      return this.$nuxt.$i18n.localeProperties.dir;
+    }
+  },
   methods : {
     async submit() {
       this.loading = true;
