@@ -42,6 +42,19 @@
               </v-text-field>
             </validation-provider>
 
+            <!--      Phone      -->
+            <validation-provider v-slot="{ errors , valid }" name="phoneNumber" rules="required|max:11|phone">
+              <v-text-field v-model="phone"
+                            :counter="11"
+                            :disabled="loading"
+                            :error-messages="errors"
+                            :color="valid ? 'green' : ''"
+                            :append-icon="valid ? 'mdi-check' : ''"
+                            prepend-inner-icon="mdi-phone-outline"
+                            :label="$t(`PHONE_NUMBER`)">
+              </v-text-field>
+            </validation-provider>
+
             <!-- Password -->
             <validation-provider v-slot="{ errors , valid }" name="password" rules="required|min:8">
               <v-text-field v-model="password"
@@ -106,6 +119,7 @@ export default {
       email          : '',
       password       : '',
       confirmPassword: '',
+      phone          : '',
       loading        : false,
     }
   },
@@ -123,6 +137,7 @@ export default {
         lastName : this.lastName,
         email    : this.email,
         password : this.password,
+        phone    : this.phone
       }).then(async response => {
         await this.$auth.setUserToken(response.data.token);
         this.$notifier.showMessage({

@@ -75,6 +75,14 @@ let messages = {
   MICROPHONE            : 'میکروفن',
   NO_CALLS              : 'شما تا به حال تماسی نداشتید',
   CREATE_CALL           : 'ایجاد تماس',
+  PHONE_NUMBER          : 'شماره تلفن',
+  CONFIRM_PHONE         : 'تایید شماره تلفن',
+  CONFIRM               : 'تایید',
+  VALIDATION_CODE       : 'کد اعتبار سنجی',
+  VALIDATION_CODE_SENT  : 'کد اعتبار سنجی ارسال شد',
+  VALIDATION_SUCCESSFUL : 'اعتبارسنجی با موفقیت انجام شد',
+  INCORRECT_VALIDATION  : 'کد اعتبار سنجی اشتباه است',
+  VALIDATION_EXPIRED    : 'کد اعتبار سنجی منقضی شده است',
 };
 
 export default messages;

@@ -23,7 +23,7 @@ const dictionary = {
       confirmed   : () => `تکرار رمز عبور اشتباه است`,
       min         : (_, {length}) => `مقدار این فیلد باید حدافل  ${length}  کاراکتر باشد `,
       max         : (_, {length}) => `مقدار این فیلد نباید بیشتر از  ${length} کاراکتر باشد`,
-      phone       : () => `شماره همراه نا معتبر است`,
+      phone       : () => `شماره تلفن نا معتبر است`,
       alpha_spaces: (_, {field}) => ` مقدار ورودی نامعتبر است`,
       color       : () => 'یک رنگ معتبر وارد کنید یا یکی از الگوها را انتخاب کنید'
     },
@@ -40,6 +40,11 @@ extend("alpha_spaces", alpha_spaces);
 extend("color", (value) => {
   return validateColor(value);
 })
+extend("phone", (value) => {
+  let regex = new RegExp('^0[0-9]{2,}[0-9]{7,}$');
+  return regex.test(value);
+})
+
 
 
 localize(dictionary);

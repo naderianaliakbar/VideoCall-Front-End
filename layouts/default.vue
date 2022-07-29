@@ -209,6 +209,18 @@ export default {
   watch   : {
     page(val, oldval) {
       this.$nuxt.$i18n.setLocale(this.$store.state.user.language);
+
+      if(
+        this.$auth.loggedIn &&
+        !this.$auth.user.validate &&
+        val !== 'validate'
+      ) {
+        // redirect to validate page
+        this.$router.push({
+          path: "/validate"
+        });
+      }
+
       if (oldval === 'call') {
         location.reload();
       }

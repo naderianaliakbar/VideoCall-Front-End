@@ -4,7 +4,7 @@ let messages = {
   LOGIN                 : 'Login',
   REGISTER              : 'Register',
   LOGOUT                : 'Logout',
-  E_MAIL                : 'E-mail Address',
+  E_MAIL                : 'Email Address',
   PASSWORD              : 'Password',
   CONFIRM_PASSWORD      : 'Confirm Password',
   SIGN_IN_WITH          : 'Sign in with',
@@ -76,6 +76,14 @@ let messages = {
   MICROPHONE            : 'Microphone',
   NO_CALLS              : 'You have not been contacted yet',
   CREATE_CALL           : 'Create Call',
+  PHONE_NUMBER          : 'Phone Number',
+  CONFIRM_PHONE         : 'Confirm Phone',
+  CONFIRM               : 'Confirm',
+  VALIDATION_CODE       : 'Validation Code',
+  VALIDATION_CODE_SENT  : 'Validation code has been sent',
+  VALIDATION_SUCCESSFUL : 'Validation Successful',
+  INCORRECT_VALIDATION  : 'The validation code is incorrect',
+  VALIDATION_EXPIRED    : 'The code has expired',
 };
 
 export default messages;

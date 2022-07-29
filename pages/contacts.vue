@@ -25,7 +25,7 @@
               transition="dialog-bottom-transition"
               persistent>
       <v-card>
-        <v-toolbar>
+        <v-toolbar color="primary">
           <v-toolbar-title>{{ $t(`ADD_CONTACT`) }}</v-toolbar-title>
 
           <v-spacer></v-spacer>
