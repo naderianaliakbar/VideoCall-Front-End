@@ -134,6 +134,11 @@ export default {
                   color  : 'error'
                 });
 
+              } else {
+                this.$notifier.showMessage({
+                  content: this.$t(`PERMISSION_DENIED`),
+                  color  : 'error'
+                });
               }
               break;
           }
