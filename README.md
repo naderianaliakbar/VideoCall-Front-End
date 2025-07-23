@@ -1,69 +1,88 @@
-# exoroya
+## 💻 VideoCall Front-End
 
-## Build Setup
+A modern single-page application (SPA) built with React.js that enables real-time video calling using WebRTC and Socket.IO.
+
+### 🚀 Features
+
+* User registration and authentication (JWT-based)
+* Real-time video and audio calling using WebRTC
+* Signaling through Socket.IO
+* User list and session management
+* Responsive UI for desktop and mobile
+* State management with Context API or Redux
+* Integration with the back-end API
+
+### ⚙️ Tech Stack
+
+| Front-End Layer  | Technology                               |
+| ---------------- | ---------------------------------------- |
+| Framework        | React.js (Hooks & Functional Components) |
+| Routing          | React Router                             |
+| State Management | Context API / Redux                      |
+| Real-Time Comm.  | WebRTC + Socket.IO Client                |
+| HTTP Requests    | Axios                                    |
+| Styling          | Tailwind CSS / CSS Modules               |
+
+### 🧩 Installation & Setup
 
 ```bash
-# install dependencies
-$ npm install
-
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
+git clone https://github.com/naderianaliakbar/VideoCall-Front-End.git
+cd VideoCall-Front-End
+npm install
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+Copy `.env.example` to `.env` and configure:
 
-## Special Directories
+```dotenv
+REACT_APP_API_URL=http://localhost:5000
+```
 
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
+### 🏁 Running the App (Development)
 
-### `assets`
+```bash
+npm start
+```
 
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
+App will be accessible at `http://localhost:3000`.
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
+### 🛠️ Key Components
 
-### `components`
+* **Authentication**
 
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
+  * Login and registration pages
+* **Dashboard**
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
+  * List of users available for video calls
+* **Video Call**
 
-### `layouts`
+  * Peer-to-peer connection using WebRTC
+  * Call status and in-call UI
+* **Signaling**
 
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
+  * Socket.IO events for offer, answer, and ICE candidate exchange
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
+### 📘 Project Structure
 
+```
+src/
+├── components/       # Video components, UI elements
+├── contexts/         # Auth & Video state
+├── hooks/            # Custom React hooks
+├── pages/            # Login, Dashboard, VideoCall
+├── services/         # API and WebRTC logic
+└── index.js
+```
 
-### `pages`
+### 💡 Usage Tips
 
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
+* Ensure `REACT_APP_API_URL` matches the back-end server URL
+* Grant camera and microphone permissions for WebRTC
+* Use HTTPS in production for proper WebRTC signaling
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
+### 🤝 Contribution
 
-### `plugins`
+Contributions are welcome! Please create a new branch and submit pull requests. Follow code linting and testing guidelines.
 
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
+### 📄 License
 
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+This project is licensed under the MIT License.
